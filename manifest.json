@@ -1,0 +1,68 @@
+{
+  "id": "awards-night",
+  "name": "Awards Night",
+  "version": "1.0.0",
+  "description": "Run a family awards night or chapter superlatives — adults set up categories, everyone casts one secret pick per category, and picks stay sealed until the ceremony reveal, then the winners are tallied.",
+  "entrypoint": "index.html",
+  "runtime": "static",
+  "category": "family",
+  "tags": ["awards", "superlatives", "voting", "family", "org"],
+  "data_access": {
+    "reads": ["family.members"],
+    "writes": []
+  },
+  "permissions": {
+    "default_audience": "everyone",
+    "requires_approval": false
+  },
+  "storage": "db",
+  "db_plaintext_columns": ["nominee_type"],
+  "row_policies": {
+    "ceremonies": {
+      "kind": "adult_writable",
+      "frozen_when": {
+        "status_column": "status",
+        "locked_values": ["archived"]
+      }
+    },
+    "categories": {
+      "kind": "adult_writable"
+    },
+    "ballots": {
+      "kind": "sealed_until",
+      "fk_column": "ceremony_id",
+      "parent_table": "ceremonies",
+      "writer_column": "member_id",
+      "parent_status_column": "status",
+      "visible_parent_status_values": ["revealed", "archived"],
+      "unique_per_member": {
+        "member_column": "member_id",
+        "scope_columns": ["category_id"]
+      },
+      "frozen_when": {
+        "status_column": "status",
+        "locked_values": ["revealed", "archived"]
+      }
+    }
+  },
+  "publishes": ["awards_night.ceremony_created", "awards_night.ceremony_revealed"],
+  "publish_acls": {
+    "awards_night.ceremony_created": { "require_role": "adult" },
+    "awards_night.ceremony_revealed": { "require_role": "adult" }
+  },
+  "alert_on": ["awards_night.ceremony_revealed"],
+  "nav": { "label": "Awards" },
+  "widget": {
+    "label": "Awards Night",
+    "size": "small"
+  },
+  "resource_limits": {
+    "max_db_bytes": 52428800
+  },
+  "icon": "🏆",
+  "ai_access": {
+    "allowed": true,
+    "mode": "read",
+    "db_exports": ["active_ceremonies", "ceremony_categories"]
+  }
+}

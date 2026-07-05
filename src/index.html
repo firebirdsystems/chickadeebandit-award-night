@@ -1,0 +1,868 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Awards Night</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --bg: var(--hub-bg, #f9fafb);
+      --surface: var(--hub-surface, #ffffff);
+      --border: var(--hub-border, #e5e7eb);
+      --border-mid: var(--hub-border, #d1d5db);
+      --text: var(--hub-text, #111827);
+      --muted: var(--hub-text-muted, #6b7280);
+      --accent: var(--hub-primary, #111827);
+      --accent-hover: var(--hub-primary-hover, #374151);
+      --accent-fg: var(--hub-primary-fg, #ffffff);
+      --radius: var(--hub-radius, 8px);
+      --green: #047857;
+      --green-soft: #d1fae5;
+      --amber: #b45309;
+      --amber-soft: #fef3c7;
+      --red: #b91c1c;
+      --red-soft: #fee2e2;
+      --blue-soft: #dbeafe;
+      --gold: #b7791f;
+      --gold-soft: #fef3c7;
+      --shadow: 0 1px 3px rgba(15, 23, 42, .07);
+    }
+    body {
+      min-height: 100vh;
+      background: var(--bg);
+      color: var(--text);
+      font-family: var(--hub-font, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif);
+      font-size: var(--hub-font-size, 15px);
+      line-height: 1.5;
+    }
+    .app { max-width: 820px; margin: 0 auto; padding: 16px; }
+    .topbar { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-bottom: 14px; }
+    h1 { font-size: 1.35rem; line-height: 1.2; }
+    h2 { font-size: 1rem; margin-bottom: 10px; }
+    .muted { color: var(--muted); }
+    .tiny { font-size: .78rem; }
+    .stack { display: grid; gap: 12px; }
+    .grid { display: grid; gap: 12px; }
+    .card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      padding: 14px;
+    }
+    .cer-card { cursor: pointer; transition: border-color .15s, box-shadow .15s; }
+    .cer-card:hover { border-color: var(--border-mid); box-shadow: 0 5px 14px rgba(15, 23, 42, .08); }
+    .cer-head { display: flex; align-items: flex-start; justify-content: space-between; gap: 10px; }
+    .cer-title { font-weight: 750; font-size: 1rem; }
+    .cer-meta { margin-top: 3px; color: var(--muted); font-size: .82rem; }
+    .pill {
+      display: inline-flex; align-items: center; justify-content: center;
+      min-height: 24px; padding: 2px 8px; border-radius: 999px;
+      background: #f1f5f9; color: var(--muted); font-size: .74rem; font-weight: 700; white-space: nowrap;
+    }
+    .pill.good { background: var(--green-soft); color: var(--green); }
+    .pill.warn { background: var(--amber-soft); color: var(--amber); }
+    .pill.info { background: var(--blue-soft); color: #1d4ed8; }
+    .pill.gold { background: var(--gold-soft); color: var(--gold); }
+    .section-head {
+      display: flex; align-items: center; justify-content: space-between;
+      gap: 10px; margin: 6px 2px 10px;
+    }
+    .section-head h2 { margin-bottom: 0; }
+    .btn {
+      display: inline-flex; align-items: center; justify-content: center; gap: 6px;
+      border: 1px solid transparent; border-radius: 8px; padding: 8px 12px;
+      font: inherit; font-size: .86rem; font-weight: 700; cursor: pointer;
+      min-height: 38px; background: var(--accent); color: var(--accent-fg);
+    }
+    .btn:hover { background: var(--accent-hover); }
+    .btn:disabled { opacity: .48; cursor: default; }
+    .btn-ghost { background: transparent; color: var(--text); border-color: var(--border-mid); }
+    .btn-ghost:hover { background: #f8fafc; }
+    .btn-danger { background: var(--red-soft); color: var(--red); border-color: transparent; }
+    .btn-danger:hover { background: #fecaca; }
+    .btn-quiet-danger {
+      min-height: 28px; padding: 3px 6px; background: transparent; color: var(--muted);
+      border: 0; font-size: .76rem; font-weight: 700; cursor: pointer;
+    }
+    .btn-quiet-danger:hover { background: var(--red-soft); color: var(--red); }
+    .btn-sm { min-height: 31px; padding: 5px 9px; font-size: .78rem; }
+    .back { margin-bottom: 10px; }
+    .cat {
+      display: grid; gap: 10px; padding: 14px 0; border-top: 1px solid var(--border);
+    }
+    .cat:first-child { border-top: 0; padding-top: 2px; }
+    .cat-top { display: flex; align-items: flex-start; justify-content: space-between; gap: 10px; }
+    .cat-title { font-weight: 750; }
+    .cat-desc { color: var(--muted); font-size: .84rem; margin-top: 2px; }
+    .my-pick {
+      display: flex; align-items: center; gap: 8px; flex-wrap: wrap;
+      background: #f8fafc; border: 1px solid var(--border); border-radius: 8px; padding: 8px 10px;
+    }
+    .my-pick .reason { color: var(--muted); font-size: .82rem; }
+    .avatar {
+      width: 24px; height: 24px; border-radius: 50%;
+      display: inline-flex; align-items: center; justify-content: center;
+      color: white; font-size: .74rem; font-weight: 800; background: #0f766e; flex: none;
+    }
+    .avatar.sm { width: 20px; height: 20px; font-size: .68rem; }
+    .result-row {
+      display: grid; grid-template-columns: 1fr auto; gap: 6px 10px; align-items: center;
+      padding: 8px 0; border-top: 1px dashed var(--border);
+    }
+    .result-row:first-child { border-top: 0; }
+    .result-nom { display: flex; align-items: center; gap: 8px; font-weight: 650; }
+    .result-nom.winner { color: var(--gold); font-weight: 800; }
+    .bar { height: 7px; border-radius: 999px; background: #eef2f7; overflow: hidden; grid-column: 1 / -1; }
+    .bar > span { display: block; height: 100%; background: var(--accent); border-radius: 999px; }
+    .bar > span.gold { background: var(--gold); }
+    .voters { grid-column: 1 / -1; color: var(--muted); font-size: .78rem; }
+    .reason-chip {
+      margin-top: 4px; padding: 6px 10px; background: #f8fafc;
+      border-left: 3px solid var(--border-mid); border-radius: 0 6px 6px 0;
+      font-size: .82rem; color: var(--text);
+    }
+    .reason-chip .who { color: var(--muted); font-weight: 700; }
+    .actions { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
+    .form { display: grid; gap: 10px; }
+    .field { display: grid; gap: 4px; }
+    label { font-size: .76rem; text-transform: uppercase; letter-spacing: .06em; color: var(--muted); font-weight: 800; }
+    input, textarea, select {
+      width: 100%; border: 1.5px solid var(--border-mid); border-radius: 8px;
+      padding: 9px 11px; font: inherit; background: var(--surface); color: var(--text);
+    }
+    textarea { min-height: 64px; resize: vertical; }
+    input:focus, textarea:focus, select:focus { outline: none; border-color: var(--accent); }
+    .cat-builder { display: grid; gap: 8px; }
+    .cat-row { display: grid; grid-template-columns: 1fr 120px auto; gap: 8px; align-items: center; }
+    .empty, .loading { color: var(--muted); text-align: center; padding: 32px 16px; }
+    .error { background: var(--red-soft); color: var(--red); padding: 9px 12px; border-radius: 8px; margin-bottom: 10px; font-size: .86rem; }
+    .notice { background: var(--amber-soft); color: var(--amber); padding: 9px 12px; border-radius: 8px; margin-bottom: 10px; font-size: .86rem; }
+    .banner {
+      display: flex; align-items: center; gap: 8px; padding: 10px 12px; border-radius: 8px;
+      background: var(--blue-soft); color: #1d4ed8; font-size: .84rem;
+    }
+    .banner.sealed { background: #ede9fe; color: #6d28d9; }
+    .banner.gold { background: var(--gold-soft); color: var(--gold); }
+    .modal-backdrop {
+      position: fixed; inset: 0; background: rgba(15, 23, 42, .45);
+      display: flex; align-items: center; justify-content: center; padding: 16px; z-index: 50;
+    }
+    .modal {
+      background: var(--surface); border-radius: 12px; box-shadow: 0 20px 50px rgba(15,23,42,.25);
+      width: 100%; max-width: 440px; max-height: 90vh; overflow-y: auto; padding: 18px;
+    }
+    .modal h2 { margin-bottom: 4px; }
+    .modal-actions { display: flex; gap: 8px; justify-content: flex-end; margin-top: 6px; }
+    .nominee-list { display: grid; gap: 6px; max-height: 260px; overflow-y: auto; }
+    .nominee {
+      display: flex; align-items: center; gap: 10px; padding: 8px 10px;
+      border: 1.5px solid var(--border); border-radius: 8px; cursor: pointer; background: var(--surface);
+    }
+    .nominee:hover { border-color: var(--border-mid); }
+    .nominee.selected { border-color: var(--accent); background: #f8fafc; }
+    .nominee .nm { font-weight: 650; }
+    @media (min-width: 700px) { .grid.two { grid-template-columns: 1fr 1fr; } }
+    @media (max-width: 560px) {
+      .topbar, .cer-head, .cat-top { align-items: stretch; flex-direction: column; }
+      .cat-row { grid-template-columns: 1fr; }
+      .actions .btn { flex: 1; }
+    }
+  </style>
+  <base href="/run/awards-night/">
+</head>
+<body>
+<div class="app">
+  <div id="root" class="loading">Loading…</div>
+</div>
+
+<script type="module">
+import { esc, memberColor, initial, hubConfirm, sendHubNotification, hubAppUrl } from "/hub-sdk.js";
+import {
+  STATUS, isVoting, isRevealed, canManage as _canManage, canCastBallot as _canCastBallot,
+  myBallotFor, myProgress, tallyCategory,
+} from "./logic.js";
+
+const CONTEXT    = window.__CONTEXT_URL ?? "";
+const DB         = window.__DB_URL ?? "";
+const EVENTS_URL = window.__EVENTS_URL ?? "/api/events";
+const APP_ID     = window.__APP_ID ?? "awards-night";
+const HUB_MEMBER = window.__CURRENT_MEMBER ?? null;
+
+let members = [];
+let memberMap = new Map();
+let currentMember = null;
+let ceremonies = [];
+let categories = [];
+let ballots = [];
+let selectedId = null;
+let view = "list";
+let error = "";
+let notice = "";
+let draftCats = [
+  { title: "Most likely to lose their keys", nominee_type: "member" },
+  { title: "Best chef in the house", nominee_type: "member" },
+  { title: "Moment of the year", nominee_type: "text" },
+];
+
+// ── Small utils ───────────────────────────────────────────────────────────────
+function nowIso() { return new Date().toISOString(); }
+function uid(prefix) { return `${prefix}-${crypto.randomUUID()}`; }
+function memberName(id) { return memberMap.get(id)?.name ?? "Unknown"; }
+function canManage() { return _canManage(currentMember); }
+function canCast() { return _canCastBallot(selectedCeremony(), currentMember); }
+function selectedCeremony() { return ceremonies.find(c => c.id === selectedId) ?? null; }
+function ceremonyCats(id) {
+  return categories
+    .filter(c => c.ceremony_id === id)
+    .sort((a, b) => a.sort_order - b.sort_order || a.created_at.localeCompare(b.created_at));
+}
+function myBallot(categoryId) { return myBallotFor(ballots, currentMember?.id, categoryId); }
+
+// ── DB helper ─────────────────────────────────────────────────────────────────
+async function dbq(sql, params = []) {
+  if (!DB) return { rows: [] };
+  const res = await fetch(DB, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ sql, params }),
+  });
+  const json = await res.json();
+  if (json.error) throw new Error(json.error);
+  return json;
+}
+
+// ── Loading ───────────────────────────────────────────────────────────────────
+async function loadMembers() {
+  if (!CONTEXT) {
+    members = [
+      { id: "demo-1", name: "Alex", role: "adult" },
+      { id: "demo-2", name: "Jordan", role: "adult" },
+      { id: "demo-3", name: "Casey", role: "child" },
+      { id: "demo-4", name: "Riley", role: "child" },
+    ];
+  } else {
+    try {
+      const res = await fetch(`${CONTEXT}?keys=family.members`);
+      members = ((await res.json())["family.members"]) ?? [];
+    } catch { members = []; }
+  }
+  memberMap = new Map(members.map(m => [m.id, m]));
+  currentMember = HUB_MEMBER ?? members[0] ?? { id: "guest", name: "Guest", role: "adult" };
+}
+
+function seedDemo() {
+  const revealedId = "demo-2025";
+  const votingId = "demo-2026";
+  ceremonies = [
+    { id: votingId, title: "2026 Family Awards", subtitle: "Cast your secret picks!", status: "voting",
+      created_by_id: "demo-1", created_by_name: "Alex", created_at: nowIso(), revealed_at: "", archived_at: "" },
+    { id: revealedId, title: "2025 Family Awards", subtitle: "The results are in", status: "revealed",
+      created_by_id: "demo-1", created_by_name: "Alex", created_at: "2025-12-30T18:00:00.000Z", revealed_at: "2025-12-31T20:00:00.000Z", archived_at: "" },
+  ];
+  categories = [
+    { id: "c-keys", ceremony_id: votingId, title: "Most likely to lose their keys", description: "", nominee_type: "member", sort_order: 0, created_by_id: "demo-1", created_at: nowIso() },
+    { id: "c-chef", ceremony_id: votingId, title: "Best chef in the house", description: "", nominee_type: "member", sort_order: 1, created_by_id: "demo-1", created_at: nowIso() },
+    { id: "c-moment", ceremony_id: votingId, title: "Moment of the year", description: "The memory we'll retell forever", nominee_type: "text", sort_order: 2, created_by_id: "demo-1", created_at: nowIso() },
+    { id: "c-dj", ceremony_id: revealedId, title: "Household DJ", description: "", nominee_type: "member", sort_order: 0, created_by_id: "demo-1", created_at: "2025-12-30T18:00:00.000Z" },
+  ];
+  ballots = [
+    { id: "b1", ceremony_id: votingId, category_id: "c-keys", member_id: "demo-1", member_name: "Alex", nominee_member_id: "demo-3", nominee_name: "Casey", reason: "Third set this month.", created_at: nowIso(), updated_at: nowIso() },
+    // Revealed ceremony — all ballots visible to everyone.
+    { id: "b2", ceremony_id: revealedId, category_id: "c-dj", member_id: "demo-1", member_name: "Alex", nominee_member_id: "demo-4", nominee_name: "Riley", reason: "Impeccable road-trip playlists.", created_at: "2025-12-31T00:00:00.000Z", updated_at: "2025-12-31T00:00:00.000Z" },
+    { id: "b3", ceremony_id: revealedId, category_id: "c-dj", member_id: "demo-2", member_name: "Jordan", nominee_member_id: "demo-4", nominee_name: "Riley", reason: "", created_at: "2025-12-31T00:00:00.000Z", updated_at: "2025-12-31T00:00:00.000Z" },
+    { id: "b4", ceremony_id: revealedId, category_id: "c-dj", member_id: "demo-3", member_name: "Casey", nominee_member_id: "demo-1", nominee_name: "Alex", reason: "Dad rock counts.", created_at: "2025-12-31T00:00:00.000Z", updated_at: "2025-12-31T00:00:00.000Z" },
+  ];
+}
+
+async function loadData() {
+  if (!DB) { seedDemo(); return; }
+  const [cerRows, catRows, ballotRows] = await Promise.all([
+    dbq("SELECT * FROM app_awards_night__ceremonies ORDER BY created_at DESC"),
+    dbq("SELECT * FROM app_awards_night__categories ORDER BY sort_order ASC, created_at ASC"),
+    dbq("SELECT * FROM app_awards_night__ballots ORDER BY created_at ASC"),
+  ]);
+  ceremonies = cerRows.rows;
+  categories = catRows.rows;
+  ballots = ballotRows.rows;
+}
+
+async function refresh() {
+  clearMessages();
+  try {
+    await loadMembers();
+    await loadData();
+    if (selectedId && !ceremonies.some(c => c.id === selectedId)) selectedId = null;
+    render();
+    handleDeepLink();
+  } catch (e) {
+    error = e.message;
+    render();
+  }
+}
+
+// Reload only ballots (e.g. after a reveal unseals everyone's picks).
+async function reloadBallots() {
+  if (!DB) return;
+  const rows = await dbq("SELECT * FROM app_awards_night__ballots ORDER BY created_at ASC");
+  ballots = rows.rows;
+}
+
+function handleDeepLink() {
+  const params = new URLSearchParams(window.location.search);
+  const id = params.get("ceremonyId");
+  if (id && ceremonies.some(c => c.id === id)) { selectedId = id; view = "list"; render(); }
+}
+
+function clearMessages() { error = ""; notice = ""; }
+function showError(m) { error = m; notice = ""; render(); }
+function showNotice(m) { notice = m; error = ""; render(); }
+
+// ── Mutations ─────────────────────────────────────────────────────────────────
+async function createCeremony(form) {
+  if (!canManage()) return showError("Only adults can create a ceremony.");
+  const title = form.title.value.trim();
+  const subtitle = form.subtitle.value.trim();
+  const cleanCats = draftCats
+    .map((c, i) => ({ ...c, title: c.title.trim(), sort_order: i }))
+    .filter(c => c.title);
+  if (!title) { form.title.focus(); return showError("Give your awards night a title."); }
+  if (!cleanCats.length) return showError("Add at least one award category.");
+
+  const btn = document.querySelector('#create-form [type="submit"]');
+  if (btn) { btn.disabled = true; btn.textContent = "Creating…"; }
+
+  const cer = {
+    id: uid("cer"), title, subtitle, status: STATUS.VOTING,
+    created_by_id: currentMember.id, created_by_name: currentMember.name,
+    created_at: nowIso(), revealed_at: "", archived_at: "",
+  };
+  const cats = cleanCats.map(c => ({
+    id: uid("cat"), ceremony_id: cer.id, title: c.title, description: "",
+    nominee_type: c.nominee_type === "text" ? "text" : "member",
+    sort_order: c.sort_order, created_by_id: currentMember.id, created_at: nowIso(),
+  }));
+
+  try {
+    if (DB) {
+      await dbq(
+        `INSERT INTO app_awards_night__ceremonies
+         (id, title, subtitle, status, created_by_id, created_by_name, created_at, revealed_at, archived_at)
+         VALUES (?, ?, ?, ?, ?, ?, ?, '', '')`,
+        [cer.id, cer.title, cer.subtitle, cer.status, cer.created_by_id, cer.created_by_name, cer.created_at]
+      );
+      for (const c of cats) {
+        await dbq(
+          `INSERT INTO app_awards_night__categories
+           (id, ceremony_id, title, description, nominee_type, sort_order, created_by_id, created_at)
+           VALUES (?, ?, ?, '', ?, ?, ?, ?)`,
+          [c.id, c.ceremony_id, c.title, c.nominee_type, c.sort_order, c.created_by_id, c.created_at]
+        );
+      }
+    }
+    ceremonies = [cer, ...ceremonies];
+    categories = [...categories, ...cats];
+    selectedId = cer.id;
+    view = "list";
+    showNotice("Awards night created. Invite everyone to cast their picks.");
+    publishEvent("awards_night.ceremony_created", cer.id, { title: cer.title });
+  } catch (e) {
+    if (btn) { btn.disabled = false; btn.textContent = "Create awards night"; }
+    showError(e.message);
+  }
+}
+
+async function saveBallot(categoryId, { nomineeMemberId, nomineeName, reason }) {
+  const cer = selectedCeremony();
+  if (!canCast()) return showError("Voting has closed for this ceremony.");
+  const existing = myBallot(categoryId);
+  const now = nowIso();
+  try {
+    if (existing) {
+      if (DB) {
+        await dbq(
+          `UPDATE app_awards_night__ballots
+           SET nominee_member_id = ?, nominee_name = ?, reason = ?, updated_at = ?
+           WHERE id = ?`,
+          [nomineeMemberId, nomineeName, reason, now, existing.id]
+        );
+      }
+      const idx = ballots.findIndex(b => b.id === existing.id);
+      if (idx !== -1) ballots[idx] = { ...ballots[idx], nominee_member_id: nomineeMemberId, nominee_name: nomineeName, reason, updated_at: now };
+    } else {
+      const b = {
+        id: uid("bal"), ceremony_id: cer.id, category_id: categoryId,
+        member_id: currentMember.id, member_name: currentMember.name,
+        nominee_member_id: nomineeMemberId, nominee_name: nomineeName, reason,
+        created_at: now, updated_at: now,
+      };
+      if (DB) {
+        await dbq(
+          `INSERT INTO app_awards_night__ballots
+           (id, ceremony_id, category_id, member_id, member_name, nominee_member_id, nominee_name, reason, created_at, updated_at)
+           VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+          [b.id, b.ceremony_id, b.category_id, b.member_id, b.member_name, b.nominee_member_id, b.nominee_name, b.reason, b.created_at, b.updated_at]
+        );
+      }
+      ballots = [...ballots, b];
+    }
+    closeModal();
+    showNotice("Your pick is sealed until the ceremony.");
+  } catch (e) {
+    showError(e.message);
+  }
+}
+
+async function revealCeremony(id) {
+  if (!canManage()) return;
+  const ok = await hubConfirm({
+    message: "Hold the ceremony and reveal all picks?",
+    description: "Every member's picks and the winners become visible to the whole household. This can't be undone.",
+    confirmLabel: "Reveal winners",
+  });
+  if (!ok) return;
+  const now = nowIso();
+  try {
+    if (DB) {
+      await dbq("UPDATE app_awards_night__ceremonies SET status = 'revealed', revealed_at = ? WHERE id = ?", [now, id]);
+      await reloadBallots();
+    }
+    const idx = ceremonies.findIndex(c => c.id === id);
+    if (idx !== -1) ceremonies[idx] = { ...ceremonies[idx], status: STATUS.REVEALED, revealed_at: now };
+    const cer = ceremonies[idx];
+    showNotice("🏆 The winners are revealed!");
+    publishEvent("awards_night.ceremony_revealed", id, { title: cer?.title });
+    sendHubNotification({
+      title: "🏆 Awards Night results are in!",
+      body: `${cer?.title ?? "The ceremony"} — see who won.`,
+      url: hubAppUrl(APP_ID, { ceremonyId: id }),
+    }).catch(() => {});
+  } catch (e) {
+    showError(e.message);
+  }
+}
+
+async function archiveCeremony(id) {
+  if (!canManage()) return;
+  const ok = await hubConfirm({
+    message: "Archive this awards night?",
+    description: "It stays viewable as a keepsake but is locked from further changes.",
+    confirmLabel: "Archive",
+    destructive: true,
+  });
+  if (!ok) return;
+  const now = nowIso();
+  try {
+    if (DB) await dbq("UPDATE app_awards_night__ceremonies SET status = 'archived', archived_at = ? WHERE id = ?", [now, id]);
+    const idx = ceremonies.findIndex(c => c.id === id);
+    if (idx !== -1) ceremonies[idx] = { ...ceremonies[idx], status: STATUS.ARCHIVED, archived_at: now };
+    showNotice("Ceremony archived.");
+  } catch (e) {
+    showError(e.message);
+  }
+}
+
+async function addCategory(form) {
+  const cer = selectedCeremony();
+  if (!canManage() || !cer || !isVoting(cer)) return;
+  const title = form.title.value.trim();
+  if (!title) { form.title.focus(); return; }
+  const nominee_type = form.nominee_type.value === "text" ? "text" : "member";
+  const sort_order = ceremonyCats(cer.id).length;
+  const cat = {
+    id: uid("cat"), ceremony_id: cer.id, title, description: "",
+    nominee_type, sort_order, created_by_id: currentMember.id, created_at: nowIso(),
+  };
+  const btn = document.querySelector('#add-cat-form [type="submit"]');
+  if (btn) { btn.disabled = true; btn.textContent = "Adding…"; }
+  try {
+    if (DB) {
+      await dbq(
+        `INSERT INTO app_awards_night__categories
+         (id, ceremony_id, title, description, nominee_type, sort_order, created_by_id, created_at)
+         VALUES (?, ?, ?, '', ?, ?, ?, ?)`,
+        [cat.id, cat.ceremony_id, cat.title, cat.nominee_type, cat.sort_order, cat.created_by_id, cat.created_at]
+      );
+    }
+    categories = [...categories, cat];
+    closeModal();
+    showNotice("Category added.");
+  } catch (e) {
+    if (btn) { btn.disabled = false; btn.textContent = "Add category"; }
+    showError(e.message);
+  }
+}
+
+async function deleteCategory(categoryId) {
+  const cer = selectedCeremony();
+  if (!canManage() || !cer || !isVoting(cer)) return;
+  const ok = await hubConfirm({
+    message: "Remove this category?",
+    description: "Any picks already cast for it will be discarded.",
+    confirmLabel: "Remove",
+    destructive: true,
+  });
+  if (!ok) return;
+  try {
+    if (DB) {
+      // Only the category row is deleted. We intentionally do NOT try to delete
+      // its ballots: the sealed_until policy scopes DELETE to the caller's own
+      // rows, so a cleanup DELETE here would leave other members' picks orphaned
+      // anyway. Orphans are inert — no surviving category references them, so
+      // they never render or tally — and freeing them cleanly would require a
+      // trusted endpoint. Removing the category is enough for the UI.
+      await dbq("DELETE FROM app_awards_night__categories WHERE id = ?", [categoryId]);
+    }
+    categories = categories.filter(c => c.id !== categoryId);
+    ballots = ballots.filter(b => b.category_id !== categoryId);
+    showNotice("Category removed.");
+  } catch (e) {
+    showError(e.message);
+  }
+}
+
+function publishEvent(type, subjectId, payload) {
+  fetch(EVENTS_URL, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ source_app_id: APP_ID, type, subject_id: subjectId, payload }),
+  }).catch(() => {});
+}
+
+// ── Modals ────────────────────────────────────────────────────────────────────
+let modalEl = null;
+let modalState = null;
+function openModal(html) {
+  closeModal();
+  modalEl = document.createElement("div");
+  modalEl.className = "modal-backdrop";
+  modalEl.innerHTML = `<div class="modal">${html}</div>`;
+  modalEl.addEventListener("click", e => { if (e.target === modalEl) closeModal(); });
+  document.body.appendChild(modalEl);
+}
+function closeModal() { modalEl?.remove(); modalEl = null; modalState = null; }
+
+function openBallotModal(categoryId) {
+  const cat = categories.find(c => c.id === categoryId);
+  if (!cat) return;
+  const existing = myBallot(categoryId);
+  modalState = { categoryId, type: cat.nominee_type, selectedMemberId: existing?.nominee_member_id || "" };
+  const reason = existing?.reason ?? "";
+  let picker;
+  if (cat.nominee_type === "member") {
+    picker = `
+      <div class="field">
+        <label>Your pick</label>
+        <div class="nominee-list">
+          ${members.map(m => `
+            <div class="nominee ${m.id === modalState.selectedMemberId ? "selected" : ""}" data-pick-member="${esc(m.id)}">
+              <span class="avatar sm" style="background:${esc(memberColor(m.id, members))}">${esc(initial(m.name))}</span>
+              <span class="nm">${esc(m.name)}</span>
+            </div>`).join("")}
+        </div>
+      </div>`;
+  } else {
+    picker = `
+      <div class="field">
+        <label for="nominee-text">Your pick</label>
+        <input id="nominee-text" data-autofocus placeholder="Write in your answer" value="${esc(existing?.nominee_name ?? "")}" maxlength="120" />
+      </div>`;
+  }
+  openModal(`
+    <h2>${esc(cat.title)}</h2>
+    <p class="muted tiny" style="margin-bottom:12px">${existing ? "Update your sealed pick." : "Your pick stays secret until the ceremony."}</p>
+    <form class="form" id="ballot-form">
+      ${picker}
+      <div class="field">
+        <label for="ballot-reason">Why? <span class="muted" style="text-transform:none;letter-spacing:0">(optional)</span></label>
+        <textarea id="ballot-reason" placeholder="A line to read out at the ceremony">${esc(reason)}</textarea>
+      </div>
+      <div class="modal-actions">
+        <button type="button" class="btn btn-ghost" data-close-modal>Cancel</button>
+        <button type="submit" class="btn">${existing ? "Update pick" : "Seal my pick"}</button>
+      </div>
+    </form>`);
+  requestAnimationFrame(() => modalEl?.querySelector("[data-autofocus]")?.focus());
+}
+
+async function submitBallot() {
+  const cat = categories.find(c => c.id === modalState?.categoryId);
+  if (!cat) return;
+  const reason = modalEl?.querySelector("#ballot-reason")?.value.trim() ?? "";
+  let nomineeMemberId = "";
+  let nomineeName = "";
+  if (cat.nominee_type === "member") {
+    nomineeMemberId = modalState.selectedMemberId;
+    if (!nomineeMemberId) return showError("Pick someone first.");
+    nomineeName = memberName(nomineeMemberId);
+  } else {
+    nomineeName = modalEl?.querySelector("#nominee-text")?.value.trim() ?? "";
+    if (!nomineeName) { modalEl?.querySelector("#nominee-text")?.focus(); return; }
+  }
+  const btn = modalEl?.querySelector('#ballot-form [type="submit"]');
+  if (btn) { btn.disabled = true; btn.textContent = "Saving…"; }
+  await saveBallot(cat.id, { nomineeMemberId, nomineeName, reason });
+}
+
+function openAddCategoryModal() {
+  openModal(`
+    <h2>Add category</h2>
+    <form class="form" id="add-cat-form">
+      <div class="field">
+        <label for="cat-title">Category</label>
+        <input id="cat-title" name="title" data-autofocus placeholder="e.g. Best dance moves" required />
+      </div>
+      <div class="field">
+        <label for="cat-type">Nominees</label>
+        <select id="cat-type" name="nominee_type">
+          <option value="member">Pick a household member</option>
+          <option value="text">Write-in answer</option>
+        </select>
+      </div>
+      <div class="modal-actions">
+        <button type="button" class="btn btn-ghost" data-close-modal>Cancel</button>
+        <button type="submit" class="btn">Add category</button>
+      </div>
+    </form>`);
+  requestAnimationFrame(() => modalEl?.querySelector("[data-autofocus]")?.focus());
+}
+
+// ── Rendering ─────────────────────────────────────────────────────────────────
+function renderMessages() {
+  return `${error ? `<div class="error">${esc(error)}</div>` : ""}${notice ? `<div class="notice">${esc(notice)}</div>` : ""}`;
+}
+
+function statusPill(cer) {
+  if (isVoting(cer)) return `<span class="pill info">Voting open</span>`;
+  if (cer.status === STATUS.REVEALED) return `<span class="pill gold">Revealed</span>`;
+  return `<span class="pill">Archived</span>`;
+}
+
+function renderCeremonyCard(cer) {
+  const cats = ceremonyCats(cer.id);
+  const prog = myProgress(cats, ballots, currentMember?.id);
+  const sub = isVoting(cer)
+    ? `${prog.done}/${prog.total} of your picks in`
+    : `${cats.length} categor${cats.length === 1 ? "y" : "ies"}`;
+  return `
+    <article class="card cer-card" data-open="${esc(cer.id)}">
+      <div class="cer-head">
+        <div>
+          <div class="cer-title">${esc(cer.title)}</div>
+          <div class="cer-meta">${esc(cer.subtitle || sub)}</div>
+        </div>
+        ${statusPill(cer)}
+      </div>
+    </article>`;
+}
+
+function renderList() {
+  return `
+    <div class="topbar">
+      <div>
+        <h1>🏆 Awards Night</h1>
+        <p class="muted tiny">Family superlatives &amp; chapter awards — sealed until the ceremony.</p>
+      </div>
+      ${canManage() ? `<button class="btn" data-view-create>New ceremony</button>` : ""}
+    </div>
+    ${renderMessages()}
+    <div class="section-head">
+      <h2>Ceremonies</h2>
+      <button class="btn btn-ghost btn-sm" data-refresh>Refresh</button>
+    </div>
+    <section class="stack">
+      ${ceremonies.length
+        ? ceremonies.map(renderCeremonyCard).join("")
+        : `<div class="card empty">No awards nights yet.${canManage() ? " Create one to get started." : ""}</div>`}
+    </section>`;
+}
+
+function renderMyPick(cat) {
+  const mine = myBallot(cat.id);
+  const cerVoting = isVoting(selectedCeremony());
+  if (!mine) {
+    return cerVoting
+      ? `<div class="actions"><button class="btn btn-sm" data-cast="${esc(cat.id)}">Cast your pick</button></div>`
+      : `<p class="muted tiny">You didn't cast a pick.</p>`;
+  }
+  const color = mine.nominee_member_id ? memberColor(mine.nominee_member_id, members) : "#64748b";
+  return `
+    <div class="my-pick">
+      <span class="avatar sm" style="background:${esc(color)}">${esc(initial(mine.nominee_name))}</span>
+      <span><strong>${esc(mine.nominee_name)}</strong>${mine.reason ? ` — <span class="reason">${esc(mine.reason)}</span>` : ""}</span>
+      ${cerVoting ? `<button class="btn btn-ghost btn-sm" style="margin-left:auto" data-cast="${esc(cat.id)}">Change</button>` : ""}
+    </div>`;
+}
+
+function renderResults(cat) {
+  const t = tallyCategory(ballots, cat);
+  if (!t.total) return `<p class="muted tiny">No picks were cast.</p>`;
+  const winnerKeys = new Set(t.winners.map(w => w.key));
+  const rows = t.results.map(r => {
+    const pct = t.total ? Math.round((r.count / t.total) * 100) : 0;
+    const isW = winnerKeys.has(r.key);
+    return `
+      <div class="result-row">
+        <div class="result-nom ${isW ? "winner" : ""}">${isW ? "🏆 " : ""}${esc(r.label)}</div>
+        <div class="pill ${isW ? "gold" : ""}">${r.count} vote${r.count === 1 ? "" : "s"}</div>
+        <div class="bar"><span class="${isW ? "gold" : ""}" style="width:${pct}%"></span></div>
+        ${r.voters.length ? `<div class="voters">${esc(r.voters.join(", "))}</div>` : ""}
+      </div>`;
+  }).join("");
+  const reasons = ballots
+    .filter(b => b.category_id === cat.id && b.reason)
+    .map(b => `<div class="reason-chip"><span class="who">${esc(b.member_name)}:</span> ${esc(b.reason)}</div>`)
+    .join("");
+  return `${rows}${reasons ? `<div style="margin-top:8px">${reasons}</div>` : ""}`;
+}
+
+function renderCategory(cat, revealed) {
+  return `
+    <div class="cat">
+      <div class="cat-top">
+        <div>
+          <div class="cat-title">${esc(cat.title)}</div>
+          ${cat.description ? `<div class="cat-desc">${esc(cat.description)}</div>` : ""}
+        </div>
+        ${canManage() && isVoting(selectedCeremony())
+          ? `<button class="btn-quiet-danger" data-del-cat="${esc(cat.id)}">Remove</button>` : ""}
+      </div>
+      ${revealed ? renderResults(cat) : renderMyPick(cat)}
+    </div>`;
+}
+
+function renderDetail() {
+  const cer = selectedCeremony();
+  if (!cer) return renderList();
+  const cats = ceremonyCats(cer.id);
+  const revealed = isRevealed(cer);
+  const prog = myProgress(cats, ballots, currentMember?.id);
+
+  let banner;
+  if (isVoting(cer)) {
+    banner = `<div class="banner sealed">🔒 Picks are sealed. You've cast ${prog.done} of ${prog.total}. Nobody sees the results until the ceremony.</div>`;
+  } else if (cer.status === STATUS.REVEALED) {
+    banner = `<div class="banner gold">🏆 Revealed! Here's how the household voted.</div>`;
+  } else {
+    banner = `<div class="banner">📦 Archived keepsake — locked from changes.</div>`;
+  }
+
+  const manageTools = canManage() ? `
+    <div class="actions">
+      ${isVoting(cer) ? `<button class="btn btn-sm" data-add-cat>Add category</button>` : ""}
+      ${isVoting(cer) ? `<button class="btn btn-sm" data-reveal="${esc(cer.id)}" ${cats.length ? "" : "disabled"}>Reveal winners</button>` : ""}
+      ${cer.status === STATUS.REVEALED ? `<button class="btn btn-ghost btn-sm" data-archive="${esc(cer.id)}">Archive</button>` : ""}
+    </div>` : "";
+
+  return `
+    <button class="btn btn-ghost btn-sm back" data-back>← All ceremonies</button>
+    ${renderMessages()}
+    <section class="card stack">
+      <div class="cer-head">
+        <div>
+          <h1>${esc(cer.title)}</h1>
+          ${cer.subtitle ? `<p class="muted">${esc(cer.subtitle)}</p>` : ""}
+        </div>
+        ${statusPill(cer)}
+      </div>
+      ${banner}
+      ${manageTools}
+    </section>
+    <section class="card">
+      <h2>Categories</h2>
+      ${cats.length
+        ? cats.map(c => renderCategory(c, revealed)).join("")
+        : `<div class="empty">No categories yet.${canManage() ? " Add one above." : ""}</div>`}
+    </section>`;
+}
+
+function renderCreate() {
+  return `
+    <button class="btn btn-ghost btn-sm back" data-view-list>← Back</button>
+    <div class="topbar"><h1>New Awards Night</h1></div>
+    ${renderMessages()}
+    <form class="card form" id="create-form">
+      <div class="field">
+        <label for="title">Title</label>
+        <input id="title" name="title" value="Year-End Family Awards" required />
+      </div>
+      <div class="field">
+        <label for="subtitle">Subtitle <span class="muted" style="text-transform:none;letter-spacing:0">(optional)</span></label>
+        <input id="subtitle" name="subtitle" placeholder="Cast your secret picks!" />
+      </div>
+      <div class="field">
+        <label>Award categories</label>
+        <div class="cat-builder">
+          ${draftCats.map((c, i) => `
+            <div class="cat-row">
+              <input data-draft="${i}" data-field="title" value="${esc(c.title)}" placeholder="e.g. Most likely to lose their keys" />
+              <select data-draft="${i}" data-field="nominee_type">
+                <option value="member" ${c.nominee_type === "member" ? "selected" : ""}>Member</option>
+                <option value="text" ${c.nominee_type === "text" ? "selected" : ""}>Write-in</option>
+              </select>
+              <button class="btn btn-ghost btn-sm" type="button" data-remove-draft="${i}">Remove</button>
+            </div>`).join("")}
+        </div>
+      </div>
+      <div class="actions">
+        <button class="btn btn-ghost" type="button" data-add-draft>Add category</button>
+        <button class="btn" type="submit">Create awards night</button>
+      </div>
+    </form>`;
+}
+
+function render() {
+  const root = document.getElementById("root");
+  root.className = "app";
+  root.innerHTML = view === "create" ? renderCreate() : selectedId ? renderDetail() : renderList();
+}
+
+// ── Draft-category editing (create form) ──────────────────────────────────────
+function addDraft() { draftCats.push({ title: "", nominee_type: "member" }); render(); }
+function removeDraft(i) { draftCats.splice(i, 1); if (!draftCats.length) addDraft(); else render(); }
+function updateDraft(i, field, value) { if (draftCats[i]) draftCats[i][field] = value; }
+
+// ── Event wiring ──────────────────────────────────────────────────────────────
+document.addEventListener("click", (e) => {
+  const nom = e.target.closest("[data-pick-member]");
+  if (nom && modalState) {
+    modalState.selectedMemberId = nom.getAttribute("data-pick-member");
+    modalEl?.querySelectorAll(".nominee").forEach(el => el.classList.toggle("selected", el === nom));
+    return;
+  }
+  const t = e.target.closest("button, [data-open]");
+  if (!t) return;
+  const open = t.getAttribute("data-open");
+  if (open) { selectedId = open; view = "list"; clearMessages(); render(); return; }
+  if (t.matches("[data-back]")) { selectedId = null; clearMessages(); render(); return; }
+  if (t.matches("[data-view-create]")) { view = "create"; clearMessages(); render(); return; }
+  if (t.matches("[data-view-list]")) { view = "list"; clearMessages(); render(); return; }
+  if (t.matches("[data-refresh]")) { refresh(); return; }
+  if (t.matches("[data-close-modal]")) { closeModal(); return; }
+  if (t.matches("[data-add-draft]")) { addDraft(); return; }
+  if (t.hasAttribute("data-remove-draft")) { removeDraft(Number(t.getAttribute("data-remove-draft"))); return; }
+  if (t.hasAttribute("data-cast")) { openBallotModal(t.getAttribute("data-cast")); return; }
+  if (t.hasAttribute("data-reveal")) { revealCeremony(t.getAttribute("data-reveal")); return; }
+  if (t.hasAttribute("data-archive")) { archiveCeremony(t.getAttribute("data-archive")); return; }
+  if (t.hasAttribute("data-del-cat")) { deleteCategory(t.getAttribute("data-del-cat")); return; }
+  if (t.matches("[data-add-cat]")) { openAddCategoryModal(); return; }
+});
+
+document.addEventListener("input", (e) => {
+  const draft = e.target.closest("[data-draft]");
+  if (draft) updateDraft(Number(draft.getAttribute("data-draft")), draft.getAttribute("data-field"), draft.value);
+});
+
+document.addEventListener("submit", (e) => {
+  if (e.target.id === "create-form") { e.preventDefault(); createCeremony(e.target); return; }
+  if (e.target.id === "ballot-form") { e.preventDefault(); submitBallot(); return; }
+  if (e.target.id === "add-cat-form") { e.preventDefault(); addCategory(e.target); return; }
+});
+
+document.addEventListener("keydown", (e) => { if (e.key === "Escape" && modalEl) closeModal(); });
+
+refresh();
+</script>
+</body>
+</html>
