@@ -1,0 +1,110 @@
+{
+  "scenarios": [
+    {
+      "name": "ballots are secret until the ceremony is revealed, and each member gets one pick per category",
+      "members": { "a": "adult", "b": "adult", "c": "child" },
+      "steps": [
+        {
+          "action": "seedRaw",
+          "sql": "INSERT INTO app_awards_night__ceremonies (id, title, status, created_by_id, created_by_name, created_at) VALUES ('cer1', 'Family Awards', 'voting', ?, 'A', '2026-01-01T00:00:00Z')",
+          "params": ["{{a}}"]
+        },
+        {
+          "action": "seedRaw",
+          "sql": "INSERT INTO app_awards_night__categories (id, ceremony_id, title, nominee_type, created_by_id, created_at) VALUES ('cat1', 'cer1', 'Funniest', 'text', ?, '2026-01-01T00:00:00Z')",
+          "params": ["{{a}}"]
+        },
+        {
+          "action": "db",
+          "as": "a",
+          "sql": "INSERT INTO app_awards_night__ballots (id, ceremony_id, category_id, member_id, member_name, nominee_name, created_at, updated_at) VALUES ('b_a', 'cer1', 'cat1', ?, 'A', 'Uncle Joe', '2026-01-02T00:00:00Z', '2026-01-02T00:00:00Z')",
+          "params": ["{{a}}"],
+          "expect": { "status": 200 }
+        },
+        {
+          "action": "db",
+          "as": "a",
+          "sql": "INSERT INTO app_awards_night__ballots (id, ceremony_id, category_id, member_id, member_name, nominee_name, created_at, updated_at) VALUES ('b_a2', 'cer1', 'cat1', ?, 'A', 'Aunt May', '2026-01-02T00:00:00Z', '2026-01-02T00:00:00Z')",
+          "params": ["{{a}}"],
+          "expect": { "status": 403, "errorIncludes": "unique_per_member" }
+        },
+        {
+          "action": "db",
+          "as": "b",
+          "sql": "INSERT INTO app_awards_night__ballots (id, ceremony_id, category_id, member_id, member_name, nominee_name, created_at, updated_at) VALUES ('b_b', 'cer1', 'cat1', ?, 'B', 'Grandpa', '2026-01-02T00:00:00Z', '2026-01-02T00:00:00Z')",
+          "params": ["{{b}}"],
+          "expect": { "status": 200 }
+        },
+        {
+          "action": "db",
+          "as": "a",
+          "sql": "SELECT id, nominee_name FROM app_awards_night__ballots WHERE ceremony_id = ?",
+          "params": ["cer1"],
+          "expect": { "status": 200, "rowCount": 1, "rowsContain": [{ "id": "b_a" }] }
+        },
+        {
+          "action": "db",
+          "as": "c",
+          "sql": "SELECT id FROM app_awards_night__ballots WHERE ceremony_id = ?",
+          "params": ["cer1"],
+          "expect": { "status": 200, "rowCount": 0 }
+        },
+        {
+          "action": "seedRaw",
+          "sql": "UPDATE app_awards_night__ceremonies SET status = 'revealed', revealed_at = '2026-01-03T00:00:00Z' WHERE id = 'cer1'"
+        },
+        {
+          "action": "db",
+          "as": "c",
+          "sql": "SELECT id FROM app_awards_night__ballots WHERE ceremony_id = ?",
+          "params": ["cer1"],
+          "expect": { "status": 200, "rowCount": 2 }
+        }
+      ]
+    },
+    {
+      "name": "once revealed, the ceremony is frozen: no new ballots and existing picks cannot be changed",
+      "members": { "a": "adult", "b": "adult" },
+      "steps": [
+        {
+          "action": "seedRaw",
+          "sql": "INSERT INTO app_awards_night__ceremonies (id, title, status, created_by_id, created_by_name, created_at) VALUES ('cer1', 'Superlatives', 'voting', ?, 'A', '2026-01-01T00:00:00Z')",
+          "params": ["{{a}}"]
+        },
+        {
+          "action": "seedRaw",
+          "sql": "INSERT INTO app_awards_night__categories (id, ceremony_id, title, nominee_type, created_by_id, created_at) VALUES ('cat1', 'cer1', 'Most Likely', 'text', ?, '2026-01-01T00:00:00Z')",
+          "params": ["{{a}}"]
+        },
+        {
+          "action": "seedRaw",
+          "sql": "INSERT INTO app_awards_night__ballots (id, ceremony_id, category_id, member_id, member_name, nominee_name, created_at, updated_at) VALUES ('b_a', 'cer1', 'cat1', ?, 'A', 'First Pick', '2026-01-02T00:00:00Z', '2026-01-02T00:00:00Z')",
+          "params": ["{{a}}"]
+        },
+        {
+          "action": "seedRaw",
+          "sql": "UPDATE app_awards_night__ceremonies SET status = 'revealed', revealed_at = '2026-01-03T00:00:00Z' WHERE id = 'cer1'"
+        },
+        {
+          "action": "db",
+          "as": "b",
+          "sql": "INSERT INTO app_awards_night__ballots (id, ceremony_id, category_id, member_id, member_name, nominee_name, created_at, updated_at) VALUES ('b_b', 'cer1', 'cat1', ?, 'B', 'Late Pick', '2026-01-04T00:00:00Z', '2026-01-04T00:00:00Z')",
+          "params": ["{{b}}"],
+          "expect": { "status": 403, "errorIncludes": "frozen" }
+        },
+        {
+          "action": "db",
+          "as": "a",
+          "sql": "UPDATE app_awards_night__ballots SET nominee_name = 'Changed My Mind' WHERE id = 'b_a'",
+          "expect": { "status": 200 }
+        },
+        {
+          "action": "db",
+          "as": "a",
+          "sql": "SELECT nominee_name FROM app_awards_night__ballots WHERE id = 'b_a'",
+          "expect": { "status": 200, "rowCount": 1, "rowsContain": [{ "nominee_name": "First Pick" }] }
+        }
+      ]
+    }
+  ]
+}
