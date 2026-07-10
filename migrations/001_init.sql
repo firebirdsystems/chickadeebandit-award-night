@@ -6,6 +6,7 @@ CREATE TABLE IF NOT EXISTS app_awards_night__ceremonies (
   created_by_id TEXT NOT NULL,
   created_by_name TEXT NOT NULL,
   created_at TEXT NOT NULL,
+  reveal_date TEXT DEFAULT '',
   revealed_at TEXT DEFAULT '',
   archived_at TEXT DEFAULT ''
 );
@@ -41,7 +42,7 @@ CREATE TABLE IF NOT EXISTS app_awards_night__ballots (
 );
 
 CREATE INDEX IF NOT EXISTS app_awards_night__ceremonies_status_idx
-  ON app_awards_night__ceremonies(status, created_at);
+  ON app_awards_night__ceremonies(status, reveal_date, created_at);
 
 CREATE INDEX IF NOT EXISTS app_awards_night__categories_ceremony_idx
   ON app_awards_night__categories(ceremony_id, sort_order);

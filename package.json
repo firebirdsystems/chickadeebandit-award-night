@@ -1,6 +1,6 @@
 {
   "name": "chickadeebandit-awards-night",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "description": "Awards night / superlatives app for Chickadee Bandit",
   "type": "module",
   "scripts": {

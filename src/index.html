@@ -208,6 +208,13 @@ let draftCats = [
 
 // ── Small utils ───────────────────────────────────────────────────────────────
 function nowIso() { return new Date().toISOString(); }
+function todayDate() { return new Date().toISOString().slice(0, 10); }
+function fmtRevealDate(value) {
+  if (!value) return "";
+  const d = new Date(value.length === 10 ? `${value}T00:00:00Z` : value);
+  if (Number.isNaN(d.getTime())) return value;
+  return d.toLocaleDateString(undefined, { month: "short", day: "numeric", year: "numeric" });
+}
 function uid(prefix) { return `${prefix}-${crypto.randomUUID()}`; }
 function memberName(id) { return memberMap.get(id)?.name ?? "Unknown"; }
 function canManage() { return _canManage(currentMember); }
@@ -257,9 +264,9 @@ function seedDemo() {
   const votingId = "demo-2026";
   ceremonies = [
     { id: votingId, title: "2026 Family Awards", subtitle: "Cast your secret picks!", status: "voting",
-      created_by_id: "demo-1", created_by_name: "Alex", created_at: nowIso(), revealed_at: "", archived_at: "" },
+      created_by_id: "demo-1", created_by_name: "Alex", created_at: nowIso(), reveal_date: "2030-12-31", revealed_at: "", archived_at: "" },
     { id: revealedId, title: "2025 Family Awards", subtitle: "The results are in", status: "revealed",
-      created_by_id: "demo-1", created_by_name: "Alex", created_at: "2025-12-30T18:00:00.000Z", revealed_at: "2025-12-31T20:00:00.000Z", archived_at: "" },
+      created_by_id: "demo-1", created_by_name: "Alex", created_at: "2025-12-30T18:00:00.000Z", reveal_date: "2025-12-31", revealed_at: "2025-12-31T20:00:00.000Z", archived_at: "" },
   ];
   categories = [
     { id: "c-keys", ceremony_id: votingId, title: "Most likely to lose their keys", description: "", nominee_type: "member", sort_order: 0, created_by_id: "demo-1", created_at: nowIso() },
@@ -324,6 +331,7 @@ async function createCeremony(form) {
   if (!canManage()) return showError("Only adults can create a ceremony.");
   const title = form.title.value.trim();
   const subtitle = form.subtitle.value.trim();
+  const revealDate = form.reveal_date.value;
   const cleanCats = draftCats
     .map((c, i) => ({ ...c, title: c.title.trim(), sort_order: i }))
     .filter(c => c.title);
@@ -336,7 +344,7 @@ async function createCeremony(form) {
   const cer = {
     id: uid("cer"), title, subtitle, status: STATUS.VOTING,
     created_by_id: currentMember.id, created_by_name: currentMember.name,
-    created_at: nowIso(), revealed_at: "", archived_at: "",
+    created_at: nowIso(), reveal_date: revealDate, revealed_at: "", archived_at: "",
   };
   const cats = cleanCats.map(c => ({
     id: uid("cat"), ceremony_id: cer.id, title: c.title, description: "",
@@ -348,9 +356,9 @@ async function createCeremony(form) {
     if (DB) {
       await dbq(
         `INSERT INTO app_awards_night__ceremonies
-         (id, title, subtitle, status, created_by_id, created_by_name, created_at, revealed_at, archived_at)
-         VALUES (?, ?, ?, ?, ?, ?, ?, '', '')`,
-        [cer.id, cer.title, cer.subtitle, cer.status, cer.created_by_id, cer.created_by_name, cer.created_at]
+         (id, title, subtitle, status, created_by_id, created_by_name, created_at, reveal_date, revealed_at, archived_at)
+         VALUES (?, ?, ?, ?, ?, ?, ?, ?, '', '')`,
+        [cer.id, cer.title, cer.subtitle, cer.status, cer.created_by_id, cer.created_by_name, cer.created_at, cer.reveal_date]
       );
       for (const c of cats) {
         await dbq(
@@ -634,9 +642,10 @@ function renderMessages() {
 }
 
 function statusPill(cer) {
+  if (cer.status === STATUS.ARCHIVED) return `<span class="pill">Archived</span>`;
+  if (isRevealed(cer)) return `<span class="pill gold">Revealed</span>`;
   if (isVoting(cer)) return `<span class="pill info">Voting open</span>`;
-  if (cer.status === STATUS.REVEALED) return `<span class="pill gold">Revealed</span>`;
-  return `<span class="pill">Archived</span>`;
+  return `<span class="pill">Closed</span>`;
 }
 
 function renderCeremonyCard(cer) {
@@ -645,12 +654,14 @@ function renderCeremonyCard(cer) {
   const sub = isVoting(cer)
     ? `${prog.done}/${prog.total} of your picks in`
     : `${cats.length} categor${cats.length === 1 ? "y" : "ies"}`;
+  const reveal = cer.reveal_date ? `<div class="cer-meta">Reveal: ${esc(fmtRevealDate(cer.reveal_date))}</div>` : "";
   return `
     <article class="card cer-card" data-open="${esc(cer.id)}">
       <div class="cer-head">
         <div>
           <div class="cer-title">${esc(cer.title)}</div>
           <div class="cer-meta">${esc(cer.subtitle || sub)}</div>
+          ${reveal}
         </div>
         ${statusPill(cer)}
       </div>
@@ -680,7 +691,8 @@ function renderList() {
 
 function renderMyPick(cat) {
   const mine = myBallot(cat.id);
-  const cerVoting = isVoting(selectedCeremony());
+  const cer = selectedCeremony();
+  const cerVoting = isVoting(cer) && !isRevealed(cer);
   if (!mine) {
     return cerVoting
       ? `<div class="actions"><button class="btn btn-sm" data-cast="${esc(cat.id)}">Cast your pick</button></div>`
@@ -725,7 +737,7 @@ function renderCategory(cat, revealed) {
           <div class="cat-title">${esc(cat.title)}</div>
           ${cat.description ? `<div class="cat-desc">${esc(cat.description)}</div>` : ""}
         </div>
-        ${canManage() && isVoting(selectedCeremony())
+        ${canManage() && isVoting(selectedCeremony()) && !revealed
           ? `<button class="btn-quiet-danger" data-del-cat="${esc(cat.id)}">Remove</button>` : ""}
       </div>
       ${revealed ? renderResults(cat) : renderMyPick(cat)}
@@ -740,18 +752,21 @@ function renderDetail() {
   const prog = myProgress(cats, ballots, currentMember?.id);
 
   let banner;
-  if (isVoting(cer)) {
-    banner = `<div class="banner sealed">🔒 Picks are sealed. You've cast ${prog.done} of ${prog.total}. Nobody sees the results until the ceremony.</div>`;
-  } else if (cer.status === STATUS.REVEALED) {
+  if (cer.status === STATUS.ARCHIVED) {
+    banner = `<div class="banner">📦 Archived keepsake — locked from changes.</div>`;
+  } else if (revealed) {
     banner = `<div class="banner gold">🏆 Revealed! Here's how the household voted.</div>`;
+  } else if (isVoting(cer)) {
+    const dateCopy = cer.reveal_date ? ` Results open on ${esc(fmtRevealDate(cer.reveal_date))}.` : " Nobody sees the results until the ceremony.";
+    banner = `<div class="banner sealed">🔒 Picks are sealed. You've cast ${prog.done} of ${prog.total}.${dateCopy}</div>`;
   } else {
     banner = `<div class="banner">📦 Archived keepsake — locked from changes.</div>`;
   }
 
   const manageTools = canManage() ? `
     <div class="actions">
-      ${isVoting(cer) ? `<button class="btn btn-sm" data-add-cat>Add category</button>` : ""}
-      ${isVoting(cer) ? `<button class="btn btn-sm" data-reveal="${esc(cer.id)}" ${cats.length ? "" : "disabled"}>Reveal winners</button>` : ""}
+      ${isVoting(cer) && !revealed ? `<button class="btn btn-sm" data-add-cat>Add category</button>` : ""}
+      ${isVoting(cer) ? `<button class="btn btn-sm" data-reveal="${esc(cer.id)}" ${cats.length ? "" : "disabled"}>${revealed ? "Finalize reveal" : "Reveal winners"}</button>` : ""}
       ${cer.status === STATUS.REVEALED ? `<button class="btn btn-ghost btn-sm" data-archive="${esc(cer.id)}">Archive</button>` : ""}
     </div>` : "";
 
@@ -763,6 +778,7 @@ function renderDetail() {
         <div>
           <h1>${esc(cer.title)}</h1>
           ${cer.subtitle ? `<p class="muted">${esc(cer.subtitle)}</p>` : ""}
+          ${cer.reveal_date ? `<p class="muted tiny">Reveal date: ${esc(fmtRevealDate(cer.reveal_date))}</p>` : ""}
         </div>
         ${statusPill(cer)}
       </div>
@@ -790,6 +806,10 @@ function renderCreate() {
       <div class="field">
         <label for="subtitle">Subtitle <span class="muted" style="text-transform:none;letter-spacing:0">(optional)</span></label>
         <input id="subtitle" name="subtitle" placeholder="Cast your secret picks!" />
+      </div>
+      <div class="field">
+        <label for="reveal_date">Reveal date <span class="muted" style="text-transform:none;letter-spacing:0">(optional)</span></label>
+        <input id="reveal_date" name="reveal_date" type="date" min="${todayDate()}" />
       </div>
       <div class="field">
         <label>Award categories</label>

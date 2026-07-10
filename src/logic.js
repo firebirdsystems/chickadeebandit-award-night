@@ -12,9 +12,17 @@ export function isVoting(ceremony) {
   return !!ceremony && ceremony.status === STATUS.VOTING;
 }
 
+// The row policy also releases ballots once the scheduled reveal date arrives.
+export function hasRevealArrived(ceremony, nowIso = new Date().toISOString()) {
+  if (!ceremony?.reveal_date) return false;
+  return ceremony.reveal_date <= nowIso;
+}
+
 // After reveal every ballot is visible; the ceremony (and its ballots) are frozen.
-export function isRevealed(ceremony) {
-  return !!ceremony && (ceremony.status === STATUS.REVEALED || ceremony.status === STATUS.ARCHIVED);
+export function isRevealed(ceremony, nowIso = new Date().toISOString()) {
+  if (!ceremony) return false;
+  if (ceremony.status === STATUS.REVEALED || ceremony.status === STATUS.ARCHIVED) return true;
+  return hasRevealArrived(ceremony, nowIso);
 }
 
 // Only adults create ceremonies/categories and move a ceremony through its
@@ -24,8 +32,8 @@ export function canManage(me) {
 }
 
 // A member may cast/change a secret pick only while the ceremony is still voting.
-export function canCastBallot(ceremony, me) {
-  return !!me && isVoting(ceremony);
+export function canCastBallot(ceremony, me, nowIso = new Date().toISOString()) {
+  return !!me && isVoting(ceremony) && !hasRevealArrived(ceremony, nowIso);
 }
 
 // ── Ballot helpers ────────────────────────────────────────────────────────────

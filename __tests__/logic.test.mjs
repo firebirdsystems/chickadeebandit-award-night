@@ -1,6 +1,6 @@
 import { describe, it, expect } from "vitest";
 import {
-  STATUS, isVoting, isRevealed, canManage, canCastBallot,
+  STATUS, isVoting, hasRevealArrived, isRevealed, canManage, canCastBallot,
   myBallotFor, myProgress, nomineeKey, tallyCategory,
 } from "../src/logic.js";
 
@@ -31,6 +31,13 @@ describe("lifecycle predicates", () => {
     expect(isRevealed({ status: STATUS.VOTING })).toBe(false);
   });
 
+  it("isRevealed follows the scheduled reveal date", () => {
+    const now = "2026-07-10T12:00:00.000Z";
+    expect(hasRevealArrived({ status: STATUS.VOTING, reveal_date: "2026-07-10" }, now)).toBe(true);
+    expect(isRevealed({ status: STATUS.VOTING, reveal_date: "2026-07-10" }, now)).toBe(true);
+    expect(isRevealed({ status: STATUS.VOTING, reveal_date: "2026-07-11" }, now)).toBe(false);
+  });
+
   it("only adults manage", () => {
     expect(canManage(adult)).toBe(true);
     expect(canManage(kid)).toBe(false);
@@ -39,6 +46,7 @@ describe("lifecycle predicates", () => {
 
   it("ballots can only be cast while voting", () => {
     expect(canCastBallot({ status: STATUS.VOTING }, kid)).toBe(true);
+    expect(canCastBallot({ status: STATUS.VOTING, reveal_date: "2026-07-10" }, kid, "2026-07-10T12:00:00.000Z")).toBe(false);
     expect(canCastBallot({ status: STATUS.REVEALED }, kid)).toBe(false);
     expect(canCastBallot({ status: STATUS.VOTING }, null)).toBe(false);
   });

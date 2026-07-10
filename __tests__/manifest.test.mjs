@@ -39,11 +39,12 @@ describe("manifest.json", () => {
     expect(Array.isArray(manifest.data_access.writes)).toBe(true);
   });
 
-  it("ballots table is sealed_until and revealed only after the ceremony", () => {
+  it("ballots table is sealed_until and revealed by ceremony status or reveal date", () => {
     const ballots = manifest.row_policies.ballots;
     expect(ballots.kind).toBe("sealed_until");
     expect(ballots.parent_table).toBe("ceremonies");
     expect(ballots.visible_parent_status_values).toContain("revealed");
+    expect(ballots.visible_after_parent_column).toBe("reveal_date");
     expect(ballots.unique_per_member.scope_columns).toContain("category_id");
   });
 });
