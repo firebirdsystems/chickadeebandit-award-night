@@ -36,9 +36,10 @@
       "parent_status_column": "status",
       "visible_parent_status_values": ["revealed", "archived"],
       "visible_after_parent_column": "reveal_date",
-      "unique_per_member": {
+      "max_per_member": {
         "member_column": "member_id",
-        "scope_columns": ["category_id"]
+        "scope_columns": ["category_id"],
+        "limit": 1
       },
       "frozen_when": {
         "status_column": "status",

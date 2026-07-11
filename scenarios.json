@@ -26,7 +26,7 @@
           "as": "a",
           "sql": "INSERT INTO app_awards_night__ballots (id, ceremony_id, category_id, member_id, member_name, nominee_name, created_at, updated_at) VALUES ('b_a2', 'cer1', 'cat1', ?, 'A', 'Aunt May', '2026-01-02T00:00:00Z', '2026-01-02T00:00:00Z')",
           "params": ["{{a}}"],
-          "expect": { "status": 403, "errorIncludes": "unique_per_member" }
+          "expect": { "status": 403, "errorIncludes": "max_per_member" }
         },
         {
           "action": "db",

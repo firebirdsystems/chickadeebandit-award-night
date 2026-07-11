@@ -36,7 +36,7 @@ CREATE TABLE IF NOT EXISTS app_awards_night__ballots (
   updated_at TEXT NOT NULL,
   FOREIGN KEY (ceremony_id) REFERENCES app_awards_night__ceremonies(id) ON DELETE CASCADE,
   FOREIGN KEY (category_id) REFERENCES app_awards_night__categories(id) ON DELETE CASCADE,
-  -- Defense in depth: the unique_per_member row policy is the real guard, but a
+  -- Defense in depth: the max_per_member row policy is the real guard, but a
   -- DB-level constraint backstops any future insert path that bypasses it.
   UNIQUE (category_id, member_id)
 );

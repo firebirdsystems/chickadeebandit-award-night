@@ -36,7 +36,7 @@ of a category is simply the nominee with the most picks.
 |---|---|---|
 | `ceremonies` | `adult_writable` + `frozen_when` (archived) | Everyone reads; only adults create and move a ceremony through its lifecycle. Archived ceremonies are frozen. |
 | `categories` | `adult_writable` | Everyone reads the categories; only adults define them. |
-| `ballots` | `sealed_until` (parent `ceremonies`) + `unique_per_member` (`category_id`) + `frozen_when` | Each member sees **only their own** pick until the ceremony `status` becomes `revealed`, then all picks are visible. One pick per member per category. Picks freeze once revealed. |
+| `ballots` | `sealed_until` (parent `ceremonies`) + `max_per_member` (`category_id`) + `frozen_when` | Each member sees **only their own** pick until the ceremony `status` becomes `revealed`, then all picks are visible. One pick per member per category. Picks freeze once revealed. |
 
 Because `sealed_until` is enforced by the hub before any SQL runs, a member
 can't peek at others' picks by calling `/api/db` directly — the seal holds even

@@ -45,7 +45,8 @@ describe("manifest.json", () => {
     expect(ballots.parent_table).toBe("ceremonies");
     expect(ballots.visible_parent_status_values).toContain("revealed");
     expect(ballots.visible_after_parent_column).toBe("reveal_date");
-    expect(ballots.unique_per_member.scope_columns).toContain("category_id");
+    expect(ballots.max_per_member.scope_columns).toContain("category_id");
+    expect(ballots.max_per_member.limit).toBe(1);
   });
 });
 
