@@ -1,7 +1,7 @@
 {
   "id": "awards-night",
   "name": "Awards Night",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "description": "Run a family awards night or chapter superlatives — adults set up categories, everyone casts one secret pick per category, and picks stay sealed until the ceremony reveal, then the winners are tallied.",
   "entrypoint": "index.html",
   "runtime": "static",
@@ -53,6 +53,13 @@
     "awards_night.ceremony_revealed": { "require_role": "adult" }
   },
   "alert_on": ["awards_night.ceremony_revealed"],
+  "agenda": {
+    "kind": "event",
+    "source": {
+      "kind": "sql",
+      "query": "SELECT id AS id, title AS title, subtitle AS subtitle, reveal_date AS when_at FROM app_awards_night__ceremonies WHERE reveal_date = :today AND status = 'voting' LIMIT 10"
+    }
+  },
   "nav": { "label": "Awards" },
   "widget": {
     "label": "Awards Night",
