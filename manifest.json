@@ -24,6 +24,15 @@
       "frozen_when": {
         "status_column": "status",
         "locked_values": ["archived"]
+      },
+      "retain_days": {
+        "default": 730,
+        "timestamp_column": "created_at",
+        "override_key": "ceremony_history",
+        "dependent_tables": [
+          { "table": "categories", "foreign_key": "ceremony_id" },
+          { "table": "ballots", "foreign_key": "ceremony_id" }
+        ]
       }
     },
     "categories": {
@@ -47,6 +56,26 @@
         "locked_values": ["revealed", "archived"]
       }
     }
+  },
+  "member_references": {
+    "ceremonies": {
+      "column": "created_by_id",
+      "on_removed": "keep"
+    },
+    "categories": {
+      "column": "created_by_id",
+      "on_removed": "keep"
+    },
+    "ballots": [
+      {
+        "column": "member_id",
+        "on_removed": "delete"
+      },
+      {
+        "column": "nominee_member_id",
+        "on_removed": "keep"
+      }
+    ]
   },
   "publishes": ["awards_night.ceremony_created", "awards_night.ceremony_revealed"],
   "publish_acls": {
