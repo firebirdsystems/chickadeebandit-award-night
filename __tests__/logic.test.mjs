@@ -1,7 +1,7 @@
 import { describe, it, expect } from "vitest";
 import {
   STATUS, isVoting, hasRevealArrived, isRevealed, canManage, canCastBallot,
-  myBallotFor, myProgress, nomineeKey, tallyCategory,
+  myBallotFor, myProgress, nomineeKey, tallyCategory, searchableFields,
 } from "../src/logic.js";
 
 const adult = { id: "a1", name: "Alex", role: "adult" };
@@ -125,5 +125,12 @@ describe("tallyCategory", () => {
     const t = tallyCategory(ballots, textCat);
     expect(t.results).toHaveLength(1);
     expect(t.results[0].count).toBe(2);
+  });
+});
+
+describe("searchableFields", () => {
+  it("matches on the subtitle, which carries what the night was for", () => {
+    expect(searchableFields({ title: "2026", subtitle: "end of season superlatives" }))
+      .toContain("end of season superlatives");
   });
 });

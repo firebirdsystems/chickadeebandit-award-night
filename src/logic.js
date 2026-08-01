@@ -88,3 +88,13 @@ export function tallyCategory(ballots, category) {
     isTie: winners.length > 1,
   };
 }
+
+/**
+ * Fields the in-app search matches against (see hub-sdk `searchMatch`).
+ * The subtitle carries what the night was actually for, so a
+ * ceremony is findable years later by its theme rather than by a title
+ * like "2026".
+ */
+export function searchableFields(item) {
+  return [item.title, item.subtitle];
+}
