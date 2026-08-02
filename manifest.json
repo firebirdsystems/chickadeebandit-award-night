@@ -90,6 +90,13 @@
       "query": "SELECT id AS id, title AS title, subtitle AS subtitle, reveal_date AS when_at FROM app_awards_night__ceremonies WHERE reveal_date = :today AND status = 'voting' LIMIT 10"
     }
   },
+  "glance": {
+    "source": {
+      "kind": "sql",
+      "query": "SELECT title AS title, NULLIF(subtitle, '') AS subtitle, NULLIF(reveal_date, '') AS at FROM app_awards_night__ceremonies WHERE status = 'voting' ORDER BY created_at DESC LIMIT 3"
+    },
+    "display": { "template": "list", "title": "title", "subtitle": "subtitle", "when": "at" }
+  },
   "nav": { "label": "Awards" },
   "widget": {
     "label": "Awards Night",
