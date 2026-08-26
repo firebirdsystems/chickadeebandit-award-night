@@ -17,6 +17,11 @@
     "requires_approval": false
   },
   "storage": "db",
+  "preload": {
+    "ceremonies": {"sql": "SELECT * FROM app_awards_night__ceremonies ORDER BY created_at DESC"},
+    "categories": {"sql": "SELECT * FROM app_awards_night__categories ORDER BY sort_order ASC, created_at ASC"},
+    "ballots": {"sql": "SELECT * FROM app_awards_night__ballots ORDER BY created_at ASC"}
+  },
   "db_plaintext_columns": ["nominee_type"],
   "row_policies": {
     "ceremonies": {
