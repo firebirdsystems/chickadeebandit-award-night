@@ -185,7 +185,7 @@
 </div>
 
 <script type="module">
-import { esc, memberColor, initial, hubConfirm, sendHubNotification, hubAppUrl, searchMatch } from "/hub-sdk.js";
+import { esc, memberColor, initial, hubConfirm, sendHubNotification, hubAppUrl, searchMatch, hubToday as todayDate } from "/hub-sdk.js";
 import {
   STATUS, isVoting, isRevealed, canManage as _canManage, canCastBallot as _canCastBallot,
   myBallotFor, myProgress, tallyCategory, searchableFields,
@@ -216,7 +216,6 @@ let draftCats = [
 
 // ── Small utils ───────────────────────────────────────────────────────────────
 function nowIso() { return new Date().toISOString(); }
-function todayDate() { return new Date().toISOString().slice(0, 10); }
 function fmtRevealDate(value) {
   if (!value) return "";
   const d = new Date(value.length === 10 ? `${value}T00:00:00Z` : value);
@@ -664,7 +663,9 @@ function renderCeremonyCard(cer) {
     : `${cats.length} categor${cats.length === 1 ? "y" : "ies"}`;
   const reveal = cer.reveal_date ? `<div class="cer-meta">Reveal: ${esc(fmtRevealDate(cer.reveal_date))}</div>` : "";
   return `
-    <article class="card cer-card" data-open="${esc(cer.id)}">
+    <article class="card cer-card" data-testid="cer-card" data-ceremony-id="${esc(cer.id)}"
+             data-revealed="${isRevealed(cer) ? "yes" : "no"}" data-progress="${prog.done}/${prog.total}"
+             data-open="${esc(cer.id)}">
       <div class="cer-head">
         <div>
           <div class="cer-title">${esc(cer.title)}</div>
@@ -723,7 +724,7 @@ function renderMyPick(cat) {
   }
   const color = mine.nominee_member_id ? memberColor(mine.nominee_member_id, members) : "#64748b";
   return `
-    <div class="my-pick">
+    <div class="my-pick" data-testid="my-pick">
       <span class="avatar sm" style="background:${esc(color)}">${esc(initial(mine.nominee_name))}</span>
       <span><strong>${esc(mine.nominee_name)}</strong>${mine.reason ? ` — <span class="reason">${esc(mine.reason)}</span>` : ""}</span>
       ${cerVoting ? `<button class="btn btn-ghost btn-sm" style="margin-left:auto" data-cast="${esc(cat.id)}">Change</button>` : ""}
@@ -738,7 +739,7 @@ function renderResults(cat) {
     const pct = t.total ? Math.round((r.count / t.total) * 100) : 0;
     const isW = winnerKeys.has(r.key);
     return `
-      <div class="result-row">
+      <div class="result-row" data-testid="result-row" data-count="${r.count}" data-winner="${isW ? "yes" : "no"}">
         <div class="result-nom ${isW ? "winner" : ""}">${isW ? "🏆 " : ""}${esc(r.label)}</div>
         <div class="pill ${isW ? "gold" : ""}">${r.count} vote${r.count === 1 ? "" : "s"}</div>
         <div class="bar"><span class="${isW ? "gold" : ""}" style="width:${pct}%"></span></div>
@@ -753,15 +754,16 @@ function renderResults(cat) {
 }
 
 function renderCategory(cat, revealed) {
+  const mine = myBallot(cat.id);
   return `
-    <div class="cat">
+    <div class="cat" data-testid="category" data-category-id="${esc(cat.id)}" data-mine="${mine ? "yes" : "no"}">
       <div class="cat-top">
         <div>
           <div class="cat-title">${esc(cat.title)}</div>
           ${cat.description ? `<div class="cat-desc">${esc(cat.description)}</div>` : ""}
         </div>
         ${canManage() && isVoting(selectedCeremony()) && !revealed
-          ? `<button class="btn-quiet-danger" data-del-cat="${esc(cat.id)}">Remove</button>` : ""}
+          ? `<button class="btn-quiet-danger" data-testid="del-cat" data-del-cat="${esc(cat.id)}">Remove</button>` : ""}
       </div>
       ${revealed ? renderResults(cat) : renderMyPick(cat)}
     </div>`;
@@ -788,8 +790,8 @@ function renderDetail() {
 
   const manageTools = canManage() ? `
     <div class="actions">
-      ${isVoting(cer) && !revealed ? `<button class="btn btn-sm" data-add-cat>Add category</button>` : ""}
-      ${isVoting(cer) ? `<button class="btn btn-sm" data-reveal="${esc(cer.id)}" ${cats.length ? "" : "disabled"}>${revealed ? "Finalize reveal" : "Reveal winners"}</button>` : ""}
+      ${isVoting(cer) && !revealed ? `<button class="btn btn-sm" data-testid="add-cat" data-add-cat>Add category</button>` : ""}
+      ${isVoting(cer) ? `<button class="btn btn-sm" data-testid="reveal-ceremony" data-reveal="${esc(cer.id)}" ${cats.length ? "" : "disabled"}>${revealed ? "Finalize reveal" : "Reveal winners"}</button>` : ""}
       ${cer.status === STATUS.REVEALED ? `<button class="btn btn-ghost btn-sm" data-archive="${esc(cer.id)}">Archive</button>` : ""}
     </div>` : "";
 

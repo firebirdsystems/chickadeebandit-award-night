@@ -1,0 +1,286 @@
+{
+  "scenarios": [
+    {
+      "name": "a sealed ceremony shows a member only their own pick, and the reveal tallies every ballot",
+      "members": {
+        "host": "admin",
+        "voter": "adult"
+      },
+      "steps": [
+        {
+          "action": "seedRaw",
+          "sql": "INSERT INTO app_awards_night__ceremonies (id, title, subtitle, status, created_by_id, created_by_name, created_at, reveal_date) VALUES (?, ?, ?, 'voting', ?, ?, datetime('now'), '2099-12-01')",
+          "params": [
+            "ui-c1",
+            "Family Awards 2026",
+            "The annual superlatives",
+            "{{host}}",
+            "Host"
+          ]
+        },
+        {
+          "action": "seedRaw",
+          "sql": "INSERT INTO app_awards_night__categories (id, ceremony_id, title, description, nominee_type, sort_order, created_by_id, created_at) VALUES (?, ?, ?, ?, 'text', 0, ?, datetime('now'))",
+          "params": [
+            "ui-k1",
+            "ui-c1",
+            "Most Likely to Lose the Remote",
+            "One nominee each",
+            "{{host}}"
+          ]
+        },
+        {
+          "action": "seedRaw",
+          "sql": "INSERT INTO app_awards_night__categories (id, ceremony_id, title, description, nominee_type, sort_order, created_by_id, created_at) VALUES (?, ?, ?, ?, 'text', 1, ?, datetime('now'))",
+          "params": [
+            "ui-k2",
+            "ui-c1",
+            "Best Snack Decision of the Year",
+            "",
+            "{{host}}"
+          ]
+        },
+        {
+          "action": "seedRaw",
+          "sql": "INSERT INTO app_awards_night__ballots (id, ceremony_id, category_id, member_id, member_name, nominee_member_id, nominee_name, reason, created_at, updated_at) VALUES (?, ?, ?, ?, ?, '', ?, ?, datetime('now'), datetime('now'))",
+          "params": [
+            "ui-b1",
+            "ui-c1",
+            "ui-k1",
+            "{{voter}}",
+            "Voter",
+            "Dad",
+            "He lost it in the fridge once"
+          ]
+        },
+        {
+          "action": "seedRaw",
+          "sql": "INSERT INTO app_awards_night__ballots (id, ceremony_id, category_id, member_id, member_name, nominee_member_id, nominee_name, reason, created_at, updated_at) VALUES (?, ?, ?, ?, ?, '', ?, ?, datetime('now'), datetime('now'))",
+          "params": [
+            "ui-b2",
+            "ui-c1",
+            "ui-k1",
+            "{{host}}",
+            "Host",
+            "Dad",
+            "Twice, actually"
+          ]
+        },
+        {
+          "action": "seedRaw",
+          "sql": "INSERT INTO app_awards_night__ballots (id, ceremony_id, category_id, member_id, member_name, nominee_member_id, nominee_name, reason, created_at, updated_at) VALUES (?, ?, ?, ?, ?, '', ?, ?, datetime('now'), datetime('now'))",
+          "params": [
+            "ui-b3",
+            "ui-c1",
+            "ui-k2",
+            "{{voter}}",
+            "Voter",
+            "Mum",
+            "Cheese toastie at midnight"
+          ]
+        },
+        {
+          "action": "seedRaw",
+          "sql": "INSERT INTO app_awards_night__ballots (id, ceremony_id, category_id, member_id, member_name, nominee_member_id, nominee_name, reason, created_at, updated_at) VALUES (?, ?, ?, ?, ?, '', ?, ?, datetime('now'), datetime('now'))",
+          "params": [
+            "ui-b4",
+            "ui-c1",
+            "ui-k2",
+            "{{host}}",
+            "Host",
+            "Gran",
+            "The tin of biscuits"
+          ]
+        },
+        {
+          "action": "open",
+          "as": "voter"
+        },
+        {
+          "action": "waitFor",
+          "selector": "[data-testid=\"cer-card\"][data-ceremony-id=\"ui-c1\"]",
+          "as": "voter"
+        },
+        {
+          "action": "expectVisible",
+          "selector": "[data-testid=\"cer-card\"][data-ceremony-id=\"ui-c1\"][data-progress=\"2/2\"]",
+          "as": "voter"
+        },
+        {
+          "action": "click",
+          "selector": "[data-testid=\"cer-card\"][data-ceremony-id=\"ui-c1\"]",
+          "as": "voter"
+        },
+        {
+          "action": "waitFor",
+          "selector": "[data-testid=\"category\"][data-category-id=\"ui-k1\"]",
+          "as": "voter"
+        },
+        {
+          "action": "expectVisible",
+          "selector": "[data-testid=\"category\"][data-category-id=\"ui-k1\"][data-mine=\"yes\"]",
+          "as": "voter"
+        },
+        {
+          "action": "expectCount",
+          "selector": "[data-testid=\"result-row\"]",
+          "count": 0,
+          "as": "voter"
+        },
+        {
+          "action": "expectCount",
+          "selector": "[data-testid=\"my-pick\"]",
+          "count": 2,
+          "as": "voter"
+        },
+        {
+          "action": "seedRaw",
+          "sql": "UPDATE app_awards_night__ceremonies SET status = 'revealed' WHERE id = ?",
+          "params": [
+            "ui-c1"
+          ]
+        },
+        {
+          "action": "reload",
+          "as": "voter"
+        },
+        {
+          "action": "waitFor",
+          "selector": "[data-testid=\"cer-card\"][data-ceremony-id=\"ui-c1\"][data-revealed=\"yes\"]",
+          "as": "voter"
+        },
+        {
+          "action": "click",
+          "selector": "[data-testid=\"cer-card\"][data-ceremony-id=\"ui-c1\"]",
+          "as": "voter"
+        },
+        {
+          "action": "waitFor",
+          "selector": "[data-testid=\"category\"][data-category-id=\"ui-k1\"]",
+          "as": "voter"
+        },
+        {
+          "action": "expectCount",
+          "selector": "[data-category-id=\"ui-k1\"] [data-testid=\"result-row\"]",
+          "count": 1,
+          "as": "voter"
+        },
+        {
+          "action": "expectVisible",
+          "selector": "[data-category-id=\"ui-k1\"] [data-testid=\"result-row\"][data-count=\"2\"][data-winner=\"yes\"]",
+          "as": "voter"
+        },
+        {
+          "action": "expectCount",
+          "selector": "[data-category-id=\"ui-k2\"] [data-testid=\"result-row\"][data-winner=\"yes\"]",
+          "count": 2,
+          "as": "voter"
+        },
+        {
+          "action": "expectText",
+          "selector": "[data-category-id=\"ui-k2\"]",
+          "text": "The tin of biscuits",
+          "as": "voter"
+        }
+      ]
+    },
+    {
+      "name": "a ceremony reveals itself on its date, and a child gets the results but none of the controls",
+      "members": {
+        "host": "admin",
+        "kid": "child"
+      },
+      "steps": [
+        {
+          "action": "seedRaw",
+          "sql": "INSERT INTO app_awards_night__ceremonies (id, title, subtitle, status, created_by_id, created_by_name, created_at, reveal_date) VALUES (?, ?, ?, 'voting', ?, ?, datetime('now'), '2020-01-01')",
+          "params": [
+            "ui-c2",
+            "Chapter Awards",
+            "Voted last spring",
+            "{{host}}",
+            "Host"
+          ]
+        },
+        {
+          "action": "seedRaw",
+          "sql": "INSERT INTO app_awards_night__categories (id, ceremony_id, title, description, nominee_type, sort_order, created_by_id, created_at) VALUES (?, ?, ?, ?, 'text', 0, ?, datetime('now'))",
+          "params": [
+            "ui-k3",
+            "ui-c2",
+            "Volunteer of the Year",
+            "",
+            "{{host}}"
+          ]
+        },
+        {
+          "action": "seedRaw",
+          "sql": "INSERT INTO app_awards_night__ballots (id, ceremony_id, category_id, member_id, member_name, nominee_member_id, nominee_name, reason, created_at, updated_at) VALUES (?, ?, ?, ?, ?, '', ?, ?, datetime('now'), datetime('now'))",
+          "params": [
+            "ui-b5",
+            "ui-c2",
+            "ui-k3",
+            "{{kid}}",
+            "Kid",
+            "Gran",
+            "She drove everyone"
+          ]
+        },
+        {
+          "action": "seedRaw",
+          "sql": "INSERT INTO app_awards_night__ballots (id, ceremony_id, category_id, member_id, member_name, nominee_member_id, nominee_name, reason, created_at, updated_at) VALUES (?, ?, ?, ?, ?, '', ?, ?, datetime('now'), datetime('now'))",
+          "params": [
+            "ui-b6",
+            "ui-c2",
+            "ui-k3",
+            "{{host}}",
+            "Host",
+            "Gran",
+            "Twice a week, no fuss"
+          ]
+        },
+        {
+          "action": "open",
+          "as": "kid"
+        },
+        {
+          "action": "waitFor",
+          "selector": "[data-testid=\"cer-card\"][data-ceremony-id=\"ui-c2\"]",
+          "as": "kid"
+        },
+        {
+          "action": "expectVisible",
+          "selector": "[data-testid=\"cer-card\"][data-ceremony-id=\"ui-c2\"][data-revealed=\"yes\"]",
+          "as": "kid"
+        },
+        {
+          "action": "click",
+          "selector": "[data-testid=\"cer-card\"][data-ceremony-id=\"ui-c2\"]",
+          "as": "kid"
+        },
+        {
+          "action": "waitFor",
+          "selector": "[data-testid=\"category\"][data-category-id=\"ui-k3\"]",
+          "as": "kid"
+        },
+        {
+          "action": "expectVisible",
+          "selector": "[data-testid=\"result-row\"][data-count=\"2\"][data-winner=\"yes\"]",
+          "as": "kid"
+        },
+        {
+          "action": "expectCount",
+          "selector": "[data-testid=\"reveal-ceremony\"]",
+          "count": 0,
+          "as": "kid"
+        },
+        {
+          "action": "expectText",
+          "selector": "[data-testid=\"category\"][data-category-id=\"ui-k3\"]",
+          "text": "She drove everyone",
+          "as": "kid"
+        }
+      ]
+    }
+  ]
+}
