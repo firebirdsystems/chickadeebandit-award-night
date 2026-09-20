@@ -1,5 +1,7 @@
 # Awards Night
 
+A [Chickadee Bandit](https://chickadeebandit.com/app-library/awards-night) app.
+
 Family superlatives and chapter awards for Chickadee Bandit. Adults set up a
 ceremony with award categories — "Most likely to lose their keys," "Best chef,"
 "Moment of the year" — and every member casts **one secret pick per category**.
