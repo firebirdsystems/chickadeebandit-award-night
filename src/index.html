@@ -185,7 +185,7 @@
 </div>
 
 <script type="module">
-import { esc, memberColor, initial, hubConfirm, sendHubNotification, hubAppUrl, searchMatch, hubToday as todayDate } from "/hub-sdk.js";
+import { esc, memberColor, initial, hubConfirm, sendHubNotification, hubAppUrl, searchMatch, hubToday as todayDate, glyph } from "/hub-sdk.js";
 import {
   STATUS, isVoting, isRevealed, canManage as _canManage, canCastBallot as _canCastBallot,
   myBallotFor, myProgress, tallyCategory, searchableFields,
@@ -681,7 +681,7 @@ function renderList() {
   return `
     <div class="topbar">
       <div>
-        <h1>🏆 Awards Night</h1>
+        <h1>${glyph("trophy")} Awards Night</h1>
         <p class="muted tiny">Family superlatives &amp; chapter awards — sealed until the ceremony.</p>
       </div>
       ${canManage() ? `<button class="btn" data-view-create>New ceremony</button>` : ""}
@@ -740,7 +740,7 @@ function renderResults(cat) {
     const isW = winnerKeys.has(r.key);
     return `
       <div class="result-row" data-testid="result-row" data-count="${r.count}" data-winner="${isW ? "yes" : "no"}">
-        <div class="result-nom ${isW ? "winner" : ""}">${isW ? "🏆 " : ""}${esc(r.label)}</div>
+        <div class="result-nom ${isW ? "winner" : ""}">${isW ? `${glyph("trophy")} ` : ""}${esc(r.label)}</div>
         <div class="pill ${isW ? "gold" : ""}">${r.count} vote${r.count === 1 ? "" : "s"}</div>
         <div class="bar"><span class="${isW ? "gold" : ""}" style="width:${pct}%"></span></div>
         ${r.voters.length ? `<div class="voters">${esc(r.voters.join(", "))}</div>` : ""}
@@ -778,14 +778,14 @@ function renderDetail() {
 
   let banner;
   if (cer.status === STATUS.ARCHIVED) {
-    banner = `<div class="banner">📦 Archived keepsake — locked from changes.</div>`;
+    banner = `<div class="banner">${glyph("archive")} Archived keepsake — locked from changes.</div>`;
   } else if (revealed) {
-    banner = `<div class="banner gold">🏆 Revealed! Here's how the household voted.</div>`;
+    banner = `<div class="banner gold">${glyph("trophy")} Revealed! Here's how the household voted.</div>`;
   } else if (isVoting(cer)) {
     const dateCopy = cer.reveal_date ? ` Results open on ${esc(fmtRevealDate(cer.reveal_date))}.` : " Nobody sees the results until the ceremony.";
-    banner = `<div class="banner sealed">🔒 Picks are sealed. You've cast ${prog.done} of ${prog.total}.${dateCopy}</div>`;
+    banner = `<div class="banner sealed">${glyph("lock")} Picks are sealed. You've cast ${prog.done} of ${prog.total}.${dateCopy}</div>`;
   } else {
-    banner = `<div class="banner">📦 Archived keepsake — locked from changes.</div>`;
+    banner = `<div class="banner">${glyph("archive")} Archived keepsake — locked from changes.</div>`;
   }
 
   const manageTools = canManage() ? `
