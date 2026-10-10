@@ -1,0 +1,1860 @@
+{
+  "seed": [
+    {
+      "sql": "INSERT INTO app_awards_night__ceremonies (id, title, subtitle, status, created_by_id, created_by_name, created_at, reveal_date) VALUES (?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-12 days','+0 minutes'), ?)",
+      "params": [
+        "perf-cer-1",
+        "Family Awards 2026",
+        "The annual superlatives",
+        "voting",
+        "{{me}}",
+        "Perf Admin",
+        "{{date:9}}"
+      ]
+    },
+    {
+      "sql": "INSERT INTO app_awards_night__categories (id, ceremony_id, title, description, nominee_type, sort_order, created_by_id, created_at) VALUES (?, ?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-12 days','+1 minutes'))",
+      "params": [
+        "perf-cer-1-cat-1",
+        "perf-cer-1",
+        "Most Likely to Lose the Remote",
+        "One nominee each",
+        "member",
+        0,
+        "{{me}}"
+      ]
+    },
+    {
+      "sql": "INSERT INTO app_awards_night__categories (id, ceremony_id, title, nominee_type, sort_order, created_by_id, created_at) VALUES (?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-12 days','+2 minutes'))",
+      "params": [
+        "perf-cer-1-cat-2",
+        "perf-cer-1",
+        "Best Snack Decision of the Year",
+        "text",
+        1,
+        "{{me}}"
+      ]
+    },
+    {
+      "sql": "INSERT INTO app_awards_night__categories (id, ceremony_id, title, description, nominee_type, sort_order, created_by_id, created_at) VALUES (?, ?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-12 days','+3 minutes'))",
+      "params": [
+        "perf-cer-1-cat-3",
+        "perf-cer-1",
+        "Most Improved Chore",
+        "Name the chore, not the person",
+        "text",
+        2,
+        "{{me}}"
+      ]
+    },
+    {
+      "sql": "INSERT INTO app_awards_night__categories (id, ceremony_id, title, description, nominee_type, sort_order, created_by_id, created_at) VALUES (?, ?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-12 days','+4 minutes'))",
+      "params": [
+        "perf-cer-1-cat-4",
+        "perf-cer-1",
+        "Funniest Moment",
+        "Describe it in a sentence",
+        "text",
+        3,
+        "{{me}}"
+      ]
+    },
+    {
+      "sql": "INSERT INTO app_awards_night__categories (id, ceremony_id, title, description, nominee_type, sort_order, created_by_id, created_at) VALUES (?, ?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-12 days','+5 minutes'))",
+      "params": [
+        "perf-cer-1-cat-5",
+        "perf-cer-1",
+        "Kindest Helper",
+        "Who showed up for someone else?",
+        "member",
+        4,
+        "{{me}}"
+      ]
+    },
+    {
+      "sql": "INSERT INTO app_awards_night__categories (id, ceremony_id, title, nominee_type, sort_order, created_by_id, created_at) VALUES (?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-12 days','+6 minutes'))",
+      "params": [
+        "perf-cer-1-cat-6",
+        "perf-cer-1",
+        "Best Playlist DJ",
+        "member",
+        5,
+        "{{me}}"
+      ]
+    },
+    {
+      "sql": "INSERT INTO app_awards_night__ballots (id, ceremony_id, category_id, member_id, member_name, nominee_member_id, nominee_name, reason, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-11 days','+7 minutes'), strftime('%Y-%m-%dT%H:%M:%fZ','now','-11 days','+7 minutes'))",
+      "params": [
+        "perf-bal-001",
+        "perf-cer-1",
+        "perf-cer-1-cat-1",
+        "{{me}}",
+        "Perf Admin",
+        "{{partner}}",
+        "Perf Partner",
+        "Still laughing about it."
+      ]
+    },
+    {
+      "sql": "INSERT INTO app_awards_night__ballots (id, ceremony_id, category_id, member_id, member_name, nominee_member_id, nominee_name, reason, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-9 days','+14 minutes'), strftime('%Y-%m-%dT%H:%M:%fZ','now','-9 days','+14 minutes'))",
+      "params": [
+        "perf-bal-002",
+        "perf-cer-1",
+        "perf-cer-1-cat-1",
+        "{{adult2}}",
+        "Perf Adult",
+        "{{child}}",
+        "Perf Child",
+        "Nobody else even came close."
+      ]
+    },
+    {
+      "sql": "INSERT INTO app_awards_night__ballots (id, ceremony_id, category_id, member_id, member_name, nominee_name, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-11 days','+21 minutes'), strftime('%Y-%m-%dT%H:%M:%fZ','now','-11 days','+21 minutes'))",
+      "params": [
+        "perf-bal-003",
+        "perf-cer-1",
+        "perf-cer-1-cat-2",
+        "{{me}}",
+        "Perf Admin",
+        "Popcorn with hot sauce"
+      ]
+    },
+    {
+      "sql": "INSERT INTO app_awards_night__ballots (id, ceremony_id, category_id, member_id, member_name, nominee_name, reason, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-10 days','+28 minutes'), strftime('%Y-%m-%dT%H:%M:%fZ','now','-10 days','+28 minutes'))",
+      "params": [
+        "perf-bal-004",
+        "perf-cer-1",
+        "perf-cer-1-cat-2",
+        "{{partner}}",
+        "Perf Partner",
+        "Dishwasher loading, finally",
+        "Changed the whole week."
+      ]
+    },
+    {
+      "sql": "INSERT INTO app_awards_night__ballots (id, ceremony_id, category_id, member_id, member_name, nominee_name, reason, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-11 days','+35 minutes'), strftime('%Y-%m-%dT%H:%M:%fZ','now','-11 days','+35 minutes'))",
+      "params": [
+        "perf-bal-005",
+        "perf-cer-1",
+        "perf-cer-1-cat-2",
+        "{{child}}",
+        "Perf Child",
+        "The tent collapsing at 2am",
+        "It happened twice, actually."
+      ]
+    },
+    {
+      "sql": "INSERT INTO app_awards_night__ballots (id, ceremony_id, category_id, member_id, member_name, nominee_name, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-11 days','+42 minutes'), strftime('%Y-%m-%dT%H:%M:%fZ','now','-11 days','+42 minutes'))",
+      "params": [
+        "perf-bal-006",
+        "perf-cer-1",
+        "perf-cer-1-cat-3",
+        "{{me}}",
+        "Perf Admin",
+        "The midnight cheese toastie"
+      ]
+    },
+    {
+      "sql": "INSERT INTO app_awards_night__ballots (id, ceremony_id, category_id, member_id, member_name, nominee_name, reason, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-9 days','+49 minutes'), strftime('%Y-%m-%dT%H:%M:%fZ','now','-9 days','+49 minutes'))",
+      "params": [
+        "perf-bal-007",
+        "perf-cer-1",
+        "perf-cer-1-cat-3",
+        "{{adult2}}",
+        "Perf Adult",
+        "Folding laundry without being asked",
+        "Nobody else even came close."
+      ]
+    },
+    {
+      "sql": "INSERT INTO app_awards_night__ballots (id, ceremony_id, category_id, member_id, member_name, nominee_name, reason, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-11 days','+56 minutes'), strftime('%Y-%m-%dT%H:%M:%fZ','now','-11 days','+56 minutes'))",
+      "params": [
+        "perf-bal-008",
+        "perf-cer-1",
+        "perf-cer-1-cat-4",
+        "{{me}}",
+        "Perf Admin",
+        "When the dog stole the sandwich",
+        "Deserves a trophy."
+      ]
+    },
+    {
+      "sql": "INSERT INTO app_awards_night__ballots (id, ceremony_id, category_id, member_id, member_name, nominee_name, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-10 days','+63 minutes'), strftime('%Y-%m-%dT%H:%M:%fZ','now','-10 days','+63 minutes'))",
+      "params": [
+        "perf-bal-009",
+        "perf-cer-1",
+        "perf-cer-1-cat-4",
+        "{{partner}}",
+        "Perf Partner",
+        "Popcorn with hot sauce"
+      ]
+    },
+    {
+      "sql": "INSERT INTO app_awards_night__ballots (id, ceremony_id, category_id, member_id, member_name, nominee_name, reason, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-11 days','+70 minutes'), strftime('%Y-%m-%dT%H:%M:%fZ','now','-11 days','+70 minutes'))",
+      "params": [
+        "perf-bal-010",
+        "perf-cer-1",
+        "perf-cer-1-cat-4",
+        "{{child}}",
+        "Perf Child",
+        "Dishwasher loading, finally",
+        "It happened twice, actually."
+      ]
+    },
+    {
+      "sql": "INSERT INTO app_awards_night__ballots (id, ceremony_id, category_id, member_id, member_name, nominee_member_id, nominee_name, reason, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-9 days','+77 minutes'), strftime('%Y-%m-%dT%H:%M:%fZ','now','-9 days','+77 minutes'))",
+      "params": [
+        "perf-bal-011",
+        "perf-cer-1",
+        "perf-cer-1-cat-5",
+        "{{adult2}}",
+        "Perf Adult",
+        "{{adult2}}",
+        "Perf Adult",
+        "Still laughing about it."
+      ]
+    },
+    {
+      "sql": "INSERT INTO app_awards_night__ballots (id, ceremony_id, category_id, member_id, member_name, nominee_member_id, nominee_name, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-10 days','+84 minutes'), strftime('%Y-%m-%dT%H:%M:%fZ','now','-10 days','+84 minutes'))",
+      "params": [
+        "perf-bal-012",
+        "perf-cer-1",
+        "perf-cer-1-cat-6",
+        "{{partner}}",
+        "Perf Partner",
+        "{{adult2}}",
+        "Perf Adult"
+      ]
+    },
+    {
+      "sql": "INSERT INTO app_awards_night__ballots (id, ceremony_id, category_id, member_id, member_name, nominee_member_id, nominee_name, reason, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-11 days','+91 minutes'), strftime('%Y-%m-%dT%H:%M:%fZ','now','-11 days','+91 minutes'))",
+      "params": [
+        "perf-bal-013",
+        "perf-cer-1",
+        "perf-cer-1-cat-6",
+        "{{child}}",
+        "Perf Child",
+        "{{child2}}",
+        "Perf Child Two",
+        "Deserves a trophy."
+      ]
+    },
+    {
+      "sql": "INSERT INTO app_awards_night__ceremonies (id, title, subtitle, status, created_by_id, created_by_name, created_at, reveal_date, revealed_at) VALUES (?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-48 days','+0 minutes'), ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-40 days','+600 minutes'))",
+      "params": [
+        "perf-cer-2",
+        "Summer Road Trip Awards",
+        "Best and worst of 2,000 miles",
+        "revealed",
+        "{{partner}}",
+        "Perf Partner",
+        "{{date:-40}}"
+      ]
+    },
+    {
+      "sql": "INSERT INTO app_awards_night__categories (id, ceremony_id, title, description, nominee_type, sort_order, created_by_id, created_at) VALUES (?, ?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-48 days','+1 minutes'))",
+      "params": [
+        "perf-cer-2-cat-1",
+        "perf-cer-2",
+        "Most Likely to Lose the Remote",
+        "One nominee each",
+        "member",
+        0,
+        "{{partner}}"
+      ]
+    },
+    {
+      "sql": "INSERT INTO app_awards_night__categories (id, ceremony_id, title, nominee_type, sort_order, created_by_id, created_at) VALUES (?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-48 days','+2 minutes'))",
+      "params": [
+        "perf-cer-2-cat-2",
+        "perf-cer-2",
+        "Best Snack Decision of the Year",
+        "text",
+        1,
+        "{{partner}}"
+      ]
+    },
+    {
+      "sql": "INSERT INTO app_awards_night__categories (id, ceremony_id, title, description, nominee_type, sort_order, created_by_id, created_at) VALUES (?, ?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-48 days','+3 minutes'))",
+      "params": [
+        "perf-cer-2-cat-3",
+        "perf-cer-2",
+        "Most Improved Chore",
+        "Name the chore, not the person",
+        "text",
+        2,
+        "{{partner}}"
+      ]
+    },
+    {
+      "sql": "INSERT INTO app_awards_night__categories (id, ceremony_id, title, description, nominee_type, sort_order, created_by_id, created_at) VALUES (?, ?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-48 days','+4 minutes'))",
+      "params": [
+        "perf-cer-2-cat-4",
+        "perf-cer-2",
+        "Funniest Moment",
+        "Describe it in a sentence",
+        "text",
+        3,
+        "{{partner}}"
+      ]
+    },
+    {
+      "sql": "INSERT INTO app_awards_night__categories (id, ceremony_id, title, description, nominee_type, sort_order, created_by_id, created_at) VALUES (?, ?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-48 days','+5 minutes'))",
+      "params": [
+        "perf-cer-2-cat-5",
+        "perf-cer-2",
+        "Kindest Helper",
+        "Who showed up for someone else?",
+        "member",
+        4,
+        "{{partner}}"
+      ]
+    },
+    {
+      "sql": "INSERT INTO app_awards_night__categories (id, ceremony_id, title, nominee_type, sort_order, created_by_id, created_at) VALUES (?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-48 days','+6 minutes'))",
+      "params": [
+        "perf-cer-2-cat-6",
+        "perf-cer-2",
+        "Best Playlist DJ",
+        "member",
+        5,
+        "{{partner}}"
+      ]
+    },
+    {
+      "sql": "INSERT INTO app_awards_night__ballots (id, ceremony_id, category_id, member_id, member_name, nominee_member_id, nominee_name, reason, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-47 days','+98 minutes'), strftime('%Y-%m-%dT%H:%M:%fZ','now','-47 days','+98 minutes'))",
+      "params": [
+        "perf-bal-014",
+        "perf-cer-2",
+        "perf-cer-2-cat-1",
+        "{{me}}",
+        "Perf Admin",
+        "{{adult2}}",
+        "Perf Adult",
+        "Changed the whole week."
+      ]
+    },
+    {
+      "sql": "INSERT INTO app_awards_night__ballots (id, ceremony_id, category_id, member_id, member_name, nominee_member_id, nominee_name, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-46 days','+105 minutes'), strftime('%Y-%m-%dT%H:%M:%fZ','now','-46 days','+105 minutes'))",
+      "params": [
+        "perf-bal-015",
+        "perf-cer-2",
+        "perf-cer-2-cat-1",
+        "{{partner}}",
+        "Perf Partner",
+        "{{child}}",
+        "Perf Child"
+      ]
+    },
+    {
+      "sql": "INSERT INTO app_awards_night__ballots (id, ceremony_id, category_id, member_id, member_name, nominee_member_id, nominee_name, reason, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-45 days','+112 minutes'), strftime('%Y-%m-%dT%H:%M:%fZ','now','-45 days','+112 minutes'))",
+      "params": [
+        "perf-bal-016",
+        "perf-cer-2",
+        "perf-cer-2-cat-1",
+        "{{adult2}}",
+        "Perf Adult",
+        "{{child2}}",
+        "Perf Child Two",
+        "Still laughing about it."
+      ]
+    },
+    {
+      "sql": "INSERT INTO app_awards_night__ballots (id, ceremony_id, category_id, member_id, member_name, nominee_member_id, nominee_name, reason, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-47 days','+119 minutes'), strftime('%Y-%m-%dT%H:%M:%fZ','now','-47 days','+119 minutes'))",
+      "params": [
+        "perf-bal-017",
+        "perf-cer-2",
+        "perf-cer-2-cat-1",
+        "{{child}}",
+        "Perf Child",
+        "{{me}}",
+        "Perf Admin",
+        "Nobody else even came close."
+      ]
+    },
+    {
+      "sql": "INSERT INTO app_awards_night__ballots (id, ceremony_id, category_id, member_id, member_name, nominee_member_id, nominee_name, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-46 days','+126 minutes'), strftime('%Y-%m-%dT%H:%M:%fZ','now','-46 days','+126 minutes'))",
+      "params": [
+        "perf-bal-018",
+        "perf-cer-2",
+        "perf-cer-2-cat-1",
+        "{{child2}}",
+        "Perf Child Two",
+        "{{partner}}",
+        "Perf Partner"
+      ]
+    },
+    {
+      "sql": "INSERT INTO app_awards_night__ballots (id, ceremony_id, category_id, member_id, member_name, nominee_name, reason, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-47 days','+133 minutes'), strftime('%Y-%m-%dT%H:%M:%fZ','now','-47 days','+133 minutes'))",
+      "params": [
+        "perf-bal-019",
+        "perf-cer-2",
+        "perf-cer-2-cat-2",
+        "{{me}}",
+        "Perf Admin",
+        "Popcorn with hot sauce",
+        "Changed the whole week."
+      ]
+    },
+    {
+      "sql": "INSERT INTO app_awards_night__ballots (id, ceremony_id, category_id, member_id, member_name, nominee_name, reason, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-46 days','+140 minutes'), strftime('%Y-%m-%dT%H:%M:%fZ','now','-46 days','+140 minutes'))",
+      "params": [
+        "perf-bal-020",
+        "perf-cer-2",
+        "perf-cer-2-cat-2",
+        "{{partner}}",
+        "Perf Partner",
+        "Dishwasher loading, finally",
+        "It happened twice, actually."
+      ]
+    },
+    {
+      "sql": "INSERT INTO app_awards_night__ballots (id, ceremony_id, category_id, member_id, member_name, nominee_name, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-45 days','+147 minutes'), strftime('%Y-%m-%dT%H:%M:%fZ','now','-45 days','+147 minutes'))",
+      "params": [
+        "perf-bal-021",
+        "perf-cer-2",
+        "perf-cer-2-cat-2",
+        "{{adult2}}",
+        "Perf Adult",
+        "The tent collapsing at 2am"
+      ]
+    },
+    {
+      "sql": "INSERT INTO app_awards_night__ballots (id, ceremony_id, category_id, member_id, member_name, nominee_name, reason, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-47 days','+154 minutes'), strftime('%Y-%m-%dT%H:%M:%fZ','now','-47 days','+154 minutes'))",
+      "params": [
+        "perf-bal-022",
+        "perf-cer-2",
+        "perf-cer-2-cat-2",
+        "{{child}}",
+        "Perf Child",
+        "Taking the bins out",
+        "Nobody else even came close."
+      ]
+    },
+    {
+      "sql": "INSERT INTO app_awards_night__ballots (id, ceremony_id, category_id, member_id, member_name, nominee_name, reason, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-46 days','+161 minutes'), strftime('%Y-%m-%dT%H:%M:%fZ','now','-46 days','+161 minutes'))",
+      "params": [
+        "perf-bal-023",
+        "perf-cer-2",
+        "perf-cer-2-cat-2",
+        "{{child2}}",
+        "Perf Child Two",
+        "The midnight cheese toastie",
+        "Deserves a trophy."
+      ]
+    },
+    {
+      "sql": "INSERT INTO app_awards_night__ballots (id, ceremony_id, category_id, member_id, member_name, nominee_name, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-47 days','+168 minutes'), strftime('%Y-%m-%dT%H:%M:%fZ','now','-47 days','+168 minutes'))",
+      "params": [
+        "perf-bal-024",
+        "perf-cer-2",
+        "perf-cer-2-cat-3",
+        "{{me}}",
+        "Perf Admin",
+        "The tin of biscuits"
+      ]
+    },
+    {
+      "sql": "INSERT INTO app_awards_night__ballots (id, ceremony_id, category_id, member_id, member_name, nominee_name, reason, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-46 days','+175 minutes'), strftime('%Y-%m-%dT%H:%M:%fZ','now','-46 days','+175 minutes'))",
+      "params": [
+        "perf-bal-025",
+        "perf-cer-2",
+        "perf-cer-2-cat-3",
+        "{{partner}}",
+        "Perf Partner",
+        "When the dog stole the sandwich",
+        "It happened twice, actually."
+      ]
+    },
+    {
+      "sql": "INSERT INTO app_awards_night__ballots (id, ceremony_id, category_id, member_id, member_name, nominee_name, reason, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-45 days','+182 minutes'), strftime('%Y-%m-%dT%H:%M:%fZ','now','-45 days','+182 minutes'))",
+      "params": [
+        "perf-bal-026",
+        "perf-cer-2",
+        "perf-cer-2-cat-3",
+        "{{adult2}}",
+        "Perf Adult",
+        "Popcorn with hot sauce",
+        "Still laughing about it."
+      ]
+    },
+    {
+      "sql": "INSERT INTO app_awards_night__ballots (id, ceremony_id, category_id, member_id, member_name, nominee_name, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-47 days','+189 minutes'), strftime('%Y-%m-%dT%H:%M:%fZ','now','-47 days','+189 minutes'))",
+      "params": [
+        "perf-bal-027",
+        "perf-cer-2",
+        "perf-cer-2-cat-3",
+        "{{child}}",
+        "Perf Child",
+        "Dishwasher loading, finally"
+      ]
+    },
+    {
+      "sql": "INSERT INTO app_awards_night__ballots (id, ceremony_id, category_id, member_id, member_name, nominee_name, reason, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-46 days','+196 minutes'), strftime('%Y-%m-%dT%H:%M:%fZ','now','-46 days','+196 minutes'))",
+      "params": [
+        "perf-bal-028",
+        "perf-cer-2",
+        "perf-cer-2-cat-3",
+        "{{child2}}",
+        "Perf Child Two",
+        "The tent collapsing at 2am",
+        "Deserves a trophy."
+      ]
+    },
+    {
+      "sql": "INSERT INTO app_awards_night__ballots (id, ceremony_id, category_id, member_id, member_name, nominee_name, reason, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-47 days','+203 minutes'), strftime('%Y-%m-%dT%H:%M:%fZ','now','-47 days','+203 minutes'))",
+      "params": [
+        "perf-bal-029",
+        "perf-cer-2",
+        "perf-cer-2-cat-4",
+        "{{me}}",
+        "Perf Admin",
+        "The midnight cheese toastie",
+        "Changed the whole week."
+      ]
+    },
+    {
+      "sql": "INSERT INTO app_awards_night__ballots (id, ceremony_id, category_id, member_id, member_name, nominee_name, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-46 days','+210 minutes'), strftime('%Y-%m-%dT%H:%M:%fZ','now','-46 days','+210 minutes'))",
+      "params": [
+        "perf-bal-030",
+        "perf-cer-2",
+        "perf-cer-2-cat-4",
+        "{{partner}}",
+        "Perf Partner",
+        "Folding laundry without being asked"
+      ]
+    },
+    {
+      "sql": "INSERT INTO app_awards_night__ballots (id, ceremony_id, category_id, member_id, member_name, nominee_name, reason, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-45 days','+217 minutes'), strftime('%Y-%m-%dT%H:%M:%fZ','now','-45 days','+217 minutes'))",
+      "params": [
+        "perf-bal-031",
+        "perf-cer-2",
+        "perf-cer-2-cat-4",
+        "{{adult2}}",
+        "Perf Adult",
+        "The tin of biscuits",
+        "Still laughing about it."
+      ]
+    },
+    {
+      "sql": "INSERT INTO app_awards_night__ballots (id, ceremony_id, category_id, member_id, member_name, nominee_name, reason, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-47 days','+224 minutes'), strftime('%Y-%m-%dT%H:%M:%fZ','now','-47 days','+224 minutes'))",
+      "params": [
+        "perf-bal-032",
+        "perf-cer-2",
+        "perf-cer-2-cat-4",
+        "{{child}}",
+        "Perf Child",
+        "When the dog stole the sandwich",
+        "Nobody else even came close."
+      ]
+    },
+    {
+      "sql": "INSERT INTO app_awards_night__ballots (id, ceremony_id, category_id, member_id, member_name, nominee_name, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-46 days','+231 minutes'), strftime('%Y-%m-%dT%H:%M:%fZ','now','-46 days','+231 minutes'))",
+      "params": [
+        "perf-bal-033",
+        "perf-cer-2",
+        "perf-cer-2-cat-4",
+        "{{child2}}",
+        "Perf Child Two",
+        "Popcorn with hot sauce"
+      ]
+    },
+    {
+      "sql": "INSERT INTO app_awards_night__ballots (id, ceremony_id, category_id, member_id, member_name, nominee_member_id, nominee_name, reason, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-47 days','+238 minutes'), strftime('%Y-%m-%dT%H:%M:%fZ','now','-47 days','+238 minutes'))",
+      "params": [
+        "perf-bal-034",
+        "perf-cer-2",
+        "perf-cer-2-cat-5",
+        "{{me}}",
+        "Perf Admin",
+        "{{partner}}",
+        "Perf Partner",
+        "Changed the whole week."
+      ]
+    },
+    {
+      "sql": "INSERT INTO app_awards_night__ballots (id, ceremony_id, category_id, member_id, member_name, nominee_member_id, nominee_name, reason, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-46 days','+245 minutes'), strftime('%Y-%m-%dT%H:%M:%fZ','now','-46 days','+245 minutes'))",
+      "params": [
+        "perf-bal-035",
+        "perf-cer-2",
+        "perf-cer-2-cat-5",
+        "{{partner}}",
+        "Perf Partner",
+        "{{adult2}}",
+        "Perf Adult",
+        "It happened twice, actually."
+      ]
+    },
+    {
+      "sql": "INSERT INTO app_awards_night__ballots (id, ceremony_id, category_id, member_id, member_name, nominee_member_id, nominee_name, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-45 days','+252 minutes'), strftime('%Y-%m-%dT%H:%M:%fZ','now','-45 days','+252 minutes'))",
+      "params": [
+        "perf-bal-036",
+        "perf-cer-2",
+        "perf-cer-2-cat-5",
+        "{{adult2}}",
+        "Perf Adult",
+        "{{child}}",
+        "Perf Child"
+      ]
+    },
+    {
+      "sql": "INSERT INTO app_awards_night__ballots (id, ceremony_id, category_id, member_id, member_name, nominee_member_id, nominee_name, reason, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-47 days','+259 minutes'), strftime('%Y-%m-%dT%H:%M:%fZ','now','-47 days','+259 minutes'))",
+      "params": [
+        "perf-bal-037",
+        "perf-cer-2",
+        "perf-cer-2-cat-5",
+        "{{child}}",
+        "Perf Child",
+        "{{child2}}",
+        "Perf Child Two",
+        "Nobody else even came close."
+      ]
+    },
+    {
+      "sql": "INSERT INTO app_awards_night__ballots (id, ceremony_id, category_id, member_id, member_name, nominee_member_id, nominee_name, reason, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-47 days','+266 minutes'), strftime('%Y-%m-%dT%H:%M:%fZ','now','-47 days','+266 minutes'))",
+      "params": [
+        "perf-bal-038",
+        "perf-cer-2",
+        "perf-cer-2-cat-6",
+        "{{me}}",
+        "Perf Admin",
+        "{{adult2}}",
+        "Perf Adult",
+        "Deserves a trophy."
+      ]
+    },
+    {
+      "sql": "INSERT INTO app_awards_night__ballots (id, ceremony_id, category_id, member_id, member_name, nominee_member_id, nominee_name, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-46 days','+273 minutes'), strftime('%Y-%m-%dT%H:%M:%fZ','now','-46 days','+273 minutes'))",
+      "params": [
+        "perf-bal-039",
+        "perf-cer-2",
+        "perf-cer-2-cat-6",
+        "{{partner}}",
+        "Perf Partner",
+        "{{child}}",
+        "Perf Child"
+      ]
+    },
+    {
+      "sql": "INSERT INTO app_awards_night__ballots (id, ceremony_id, category_id, member_id, member_name, nominee_member_id, nominee_name, reason, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-45 days','+280 minutes'), strftime('%Y-%m-%dT%H:%M:%fZ','now','-45 days','+280 minutes'))",
+      "params": [
+        "perf-bal-040",
+        "perf-cer-2",
+        "perf-cer-2-cat-6",
+        "{{adult2}}",
+        "Perf Adult",
+        "{{child2}}",
+        "Perf Child Two",
+        "It happened twice, actually."
+      ]
+    },
+    {
+      "sql": "INSERT INTO app_awards_night__ballots (id, ceremony_id, category_id, member_id, member_name, nominee_member_id, nominee_name, reason, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-46 days','+287 minutes'), strftime('%Y-%m-%dT%H:%M:%fZ','now','-46 days','+287 minutes'))",
+      "params": [
+        "perf-bal-041",
+        "perf-cer-2",
+        "perf-cer-2-cat-6",
+        "{{child2}}",
+        "Perf Child Two",
+        "{{partner}}",
+        "Perf Partner",
+        "Still laughing about it."
+      ]
+    },
+    {
+      "sql": "INSERT INTO app_awards_night__ceremonies (id, title, subtitle, status, created_by_id, created_by_name, created_at, reveal_date, revealed_at) VALUES (?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-105 days','+0 minutes'), ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-98 days','+600 minutes'))",
+      "params": [
+        "perf-cer-3",
+        "School Year Wrap-Up",
+        "Celebrating a big year",
+        "revealed",
+        "{{me}}",
+        "Perf Admin",
+        "{{date:-98}}"
+      ]
+    },
+    {
+      "sql": "INSERT INTO app_awards_night__categories (id, ceremony_id, title, description, nominee_type, sort_order, created_by_id, created_at) VALUES (?, ?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-105 days','+1 minutes'))",
+      "params": [
+        "perf-cer-3-cat-1",
+        "perf-cer-3",
+        "Most Likely to Lose the Remote",
+        "One nominee each",
+        "member",
+        0,
+        "{{me}}"
+      ]
+    },
+    {
+      "sql": "INSERT INTO app_awards_night__categories (id, ceremony_id, title, nominee_type, sort_order, created_by_id, created_at) VALUES (?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-105 days','+2 minutes'))",
+      "params": [
+        "perf-cer-3-cat-2",
+        "perf-cer-3",
+        "Best Snack Decision of the Year",
+        "text",
+        1,
+        "{{me}}"
+      ]
+    },
+    {
+      "sql": "INSERT INTO app_awards_night__categories (id, ceremony_id, title, description, nominee_type, sort_order, created_by_id, created_at) VALUES (?, ?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-105 days','+3 minutes'))",
+      "params": [
+        "perf-cer-3-cat-3",
+        "perf-cer-3",
+        "Most Improved Chore",
+        "Name the chore, not the person",
+        "text",
+        2,
+        "{{me}}"
+      ]
+    },
+    {
+      "sql": "INSERT INTO app_awards_night__categories (id, ceremony_id, title, description, nominee_type, sort_order, created_by_id, created_at) VALUES (?, ?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-105 days','+4 minutes'))",
+      "params": [
+        "perf-cer-3-cat-4",
+        "perf-cer-3",
+        "Funniest Moment",
+        "Describe it in a sentence",
+        "text",
+        3,
+        "{{me}}"
+      ]
+    },
+    {
+      "sql": "INSERT INTO app_awards_night__categories (id, ceremony_id, title, description, nominee_type, sort_order, created_by_id, created_at) VALUES (?, ?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-105 days','+5 minutes'))",
+      "params": [
+        "perf-cer-3-cat-5",
+        "perf-cer-3",
+        "Kindest Helper",
+        "Who showed up for someone else?",
+        "member",
+        4,
+        "{{me}}"
+      ]
+    },
+    {
+      "sql": "INSERT INTO app_awards_night__categories (id, ceremony_id, title, nominee_type, sort_order, created_by_id, created_at) VALUES (?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-105 days','+6 minutes'))",
+      "params": [
+        "perf-cer-3-cat-6",
+        "perf-cer-3",
+        "Best Playlist DJ",
+        "member",
+        5,
+        "{{me}}"
+      ]
+    },
+    {
+      "sql": "INSERT INTO app_awards_night__ballots (id, ceremony_id, category_id, member_id, member_name, nominee_member_id, nominee_name, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-104 days','+294 minutes'), strftime('%Y-%m-%dT%H:%M:%fZ','now','-104 days','+294 minutes'))",
+      "params": [
+        "perf-bal-042",
+        "perf-cer-3",
+        "perf-cer-3-cat-1",
+        "{{me}}",
+        "Perf Admin",
+        "{{child}}",
+        "Perf Child"
+      ]
+    },
+    {
+      "sql": "INSERT INTO app_awards_night__ballots (id, ceremony_id, category_id, member_id, member_name, nominee_member_id, nominee_name, reason, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-103 days','+301 minutes'), strftime('%Y-%m-%dT%H:%M:%fZ','now','-103 days','+301 minutes'))",
+      "params": [
+        "perf-bal-043",
+        "perf-cer-3",
+        "perf-cer-3-cat-1",
+        "{{partner}}",
+        "Perf Partner",
+        "{{child2}}",
+        "Perf Child Two",
+        "Deserves a trophy."
+      ]
+    },
+    {
+      "sql": "INSERT INTO app_awards_night__ballots (id, ceremony_id, category_id, member_id, member_name, nominee_member_id, nominee_name, reason, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-102 days','+308 minutes'), strftime('%Y-%m-%dT%H:%M:%fZ','now','-102 days','+308 minutes'))",
+      "params": [
+        "perf-bal-044",
+        "perf-cer-3",
+        "perf-cer-3-cat-1",
+        "{{adult2}}",
+        "Perf Adult",
+        "{{me}}",
+        "Perf Admin",
+        "Changed the whole week."
+      ]
+    },
+    {
+      "sql": "INSERT INTO app_awards_night__ballots (id, ceremony_id, category_id, member_id, member_name, nominee_member_id, nominee_name, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-104 days','+315 minutes'), strftime('%Y-%m-%dT%H:%M:%fZ','now','-104 days','+315 minutes'))",
+      "params": [
+        "perf-bal-045",
+        "perf-cer-3",
+        "perf-cer-3-cat-1",
+        "{{child}}",
+        "Perf Child",
+        "{{partner}}",
+        "Perf Partner"
+      ]
+    },
+    {
+      "sql": "INSERT INTO app_awards_night__ballots (id, ceremony_id, category_id, member_id, member_name, nominee_member_id, nominee_name, reason, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-103 days','+322 minutes'), strftime('%Y-%m-%dT%H:%M:%fZ','now','-103 days','+322 minutes'))",
+      "params": [
+        "perf-bal-046",
+        "perf-cer-3",
+        "perf-cer-3-cat-1",
+        "{{child2}}",
+        "Perf Child Two",
+        "{{adult2}}",
+        "Perf Adult",
+        "Still laughing about it."
+      ]
+    },
+    {
+      "sql": "INSERT INTO app_awards_night__ballots (id, ceremony_id, category_id, member_id, member_name, nominee_name, reason, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-104 days','+329 minutes'), strftime('%Y-%m-%dT%H:%M:%fZ','now','-104 days','+329 minutes'))",
+      "params": [
+        "perf-bal-047",
+        "perf-cer-3",
+        "perf-cer-3-cat-2",
+        "{{me}}",
+        "Perf Admin",
+        "The midnight cheese toastie",
+        "Nobody else even came close."
+      ]
+    },
+    {
+      "sql": "INSERT INTO app_awards_night__ballots (id, ceremony_id, category_id, member_id, member_name, nominee_name, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-103 days','+336 minutes'), strftime('%Y-%m-%dT%H:%M:%fZ','now','-103 days','+336 minutes'))",
+      "params": [
+        "perf-bal-048",
+        "perf-cer-3",
+        "perf-cer-3-cat-2",
+        "{{partner}}",
+        "Perf Partner",
+        "Folding laundry without being asked"
+      ]
+    },
+    {
+      "sql": "INSERT INTO app_awards_night__ballots (id, ceremony_id, category_id, member_id, member_name, nominee_name, reason, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-102 days','+343 minutes'), strftime('%Y-%m-%dT%H:%M:%fZ','now','-102 days','+343 minutes'))",
+      "params": [
+        "perf-bal-049",
+        "perf-cer-3",
+        "perf-cer-3-cat-2",
+        "{{adult2}}",
+        "Perf Adult",
+        "The tin of biscuits",
+        "Changed the whole week."
+      ]
+    },
+    {
+      "sql": "INSERT INTO app_awards_night__ballots (id, ceremony_id, category_id, member_id, member_name, nominee_name, reason, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-104 days','+350 minutes'), strftime('%Y-%m-%dT%H:%M:%fZ','now','-104 days','+350 minutes'))",
+      "params": [
+        "perf-bal-050",
+        "perf-cer-3",
+        "perf-cer-3-cat-2",
+        "{{child}}",
+        "Perf Child",
+        "When the dog stole the sandwich",
+        "It happened twice, actually."
+      ]
+    },
+    {
+      "sql": "INSERT INTO app_awards_night__ballots (id, ceremony_id, category_id, member_id, member_name, nominee_name, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-103 days','+357 minutes'), strftime('%Y-%m-%dT%H:%M:%fZ','now','-103 days','+357 minutes'))",
+      "params": [
+        "perf-bal-051",
+        "perf-cer-3",
+        "perf-cer-3-cat-2",
+        "{{child2}}",
+        "Perf Child Two",
+        "Popcorn with hot sauce"
+      ]
+    },
+    {
+      "sql": "INSERT INTO app_awards_night__ballots (id, ceremony_id, category_id, member_id, member_name, nominee_name, reason, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-104 days','+364 minutes'), strftime('%Y-%m-%dT%H:%M:%fZ','now','-104 days','+364 minutes'))",
+      "params": [
+        "perf-bal-052",
+        "perf-cer-3",
+        "perf-cer-3-cat-3",
+        "{{me}}",
+        "Perf Admin",
+        "The tent collapsing at 2am",
+        "Nobody else even came close."
+      ]
+    },
+    {
+      "sql": "INSERT INTO app_awards_night__ballots (id, ceremony_id, category_id, member_id, member_name, nominee_name, reason, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-103 days','+371 minutes'), strftime('%Y-%m-%dT%H:%M:%fZ','now','-103 days','+371 minutes'))",
+      "params": [
+        "perf-bal-053",
+        "perf-cer-3",
+        "perf-cer-3-cat-3",
+        "{{partner}}",
+        "Perf Partner",
+        "Taking the bins out",
+        "Deserves a trophy."
+      ]
+    },
+    {
+      "sql": "INSERT INTO app_awards_night__ballots (id, ceremony_id, category_id, member_id, member_name, nominee_name, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-102 days','+378 minutes'), strftime('%Y-%m-%dT%H:%M:%fZ','now','-102 days','+378 minutes'))",
+      "params": [
+        "perf-bal-054",
+        "perf-cer-3",
+        "perf-cer-3-cat-3",
+        "{{adult2}}",
+        "Perf Adult",
+        "The midnight cheese toastie"
+      ]
+    },
+    {
+      "sql": "INSERT INTO app_awards_night__ballots (id, ceremony_id, category_id, member_id, member_name, nominee_name, reason, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-104 days','+385 minutes'), strftime('%Y-%m-%dT%H:%M:%fZ','now','-104 days','+385 minutes'))",
+      "params": [
+        "perf-bal-055",
+        "perf-cer-3",
+        "perf-cer-3-cat-3",
+        "{{child}}",
+        "Perf Child",
+        "Folding laundry without being asked",
+        "It happened twice, actually."
+      ]
+    },
+    {
+      "sql": "INSERT INTO app_awards_night__ballots (id, ceremony_id, category_id, member_id, member_name, nominee_name, reason, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-103 days','+392 minutes'), strftime('%Y-%m-%dT%H:%M:%fZ','now','-103 days','+392 minutes'))",
+      "params": [
+        "perf-bal-056",
+        "perf-cer-3",
+        "perf-cer-3-cat-3",
+        "{{child2}}",
+        "Perf Child Two",
+        "The tin of biscuits",
+        "Still laughing about it."
+      ]
+    },
+    {
+      "sql": "INSERT INTO app_awards_night__ballots (id, ceremony_id, category_id, member_id, member_name, nominee_name, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-104 days','+399 minutes'), strftime('%Y-%m-%dT%H:%M:%fZ','now','-104 days','+399 minutes'))",
+      "params": [
+        "perf-bal-057",
+        "perf-cer-3",
+        "perf-cer-3-cat-4",
+        "{{me}}",
+        "Perf Admin",
+        "Popcorn with hot sauce"
+      ]
+    },
+    {
+      "sql": "INSERT INTO app_awards_night__ballots (id, ceremony_id, category_id, member_id, member_name, nominee_name, reason, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-103 days','+406 minutes'), strftime('%Y-%m-%dT%H:%M:%fZ','now','-103 days','+406 minutes'))",
+      "params": [
+        "perf-bal-058",
+        "perf-cer-3",
+        "perf-cer-3-cat-4",
+        "{{partner}}",
+        "Perf Partner",
+        "Dishwasher loading, finally",
+        "Deserves a trophy."
+      ]
+    },
+    {
+      "sql": "INSERT INTO app_awards_night__ballots (id, ceremony_id, category_id, member_id, member_name, nominee_name, reason, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-102 days','+413 minutes'), strftime('%Y-%m-%dT%H:%M:%fZ','now','-102 days','+413 minutes'))",
+      "params": [
+        "perf-bal-059",
+        "perf-cer-3",
+        "perf-cer-3-cat-4",
+        "{{adult2}}",
+        "Perf Adult",
+        "The tent collapsing at 2am",
+        "Changed the whole week."
+      ]
+    },
+    {
+      "sql": "INSERT INTO app_awards_night__ballots (id, ceremony_id, category_id, member_id, member_name, nominee_name, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-104 days','+420 minutes'), strftime('%Y-%m-%dT%H:%M:%fZ','now','-104 days','+420 minutes'))",
+      "params": [
+        "perf-bal-060",
+        "perf-cer-3",
+        "perf-cer-3-cat-4",
+        "{{child}}",
+        "Perf Child",
+        "Taking the bins out"
+      ]
+    },
+    {
+      "sql": "INSERT INTO app_awards_night__ballots (id, ceremony_id, category_id, member_id, member_name, nominee_member_id, nominee_name, reason, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-104 days','+427 minutes'), strftime('%Y-%m-%dT%H:%M:%fZ','now','-104 days','+427 minutes'))",
+      "params": [
+        "perf-bal-061",
+        "perf-cer-3",
+        "perf-cer-3-cat-5",
+        "{{me}}",
+        "Perf Admin",
+        "{{adult2}}",
+        "Perf Adult",
+        "Still laughing about it."
+      ]
+    },
+    {
+      "sql": "INSERT INTO app_awards_night__ballots (id, ceremony_id, category_id, member_id, member_name, nominee_member_id, nominee_name, reason, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-103 days','+434 minutes'), strftime('%Y-%m-%dT%H:%M:%fZ','now','-103 days','+434 minutes'))",
+      "params": [
+        "perf-bal-062",
+        "perf-cer-3",
+        "perf-cer-3-cat-5",
+        "{{partner}}",
+        "Perf Partner",
+        "{{child}}",
+        "Perf Child",
+        "Nobody else even came close."
+      ]
+    },
+    {
+      "sql": "INSERT INTO app_awards_night__ballots (id, ceremony_id, category_id, member_id, member_name, nominee_member_id, nominee_name, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-102 days','+441 minutes'), strftime('%Y-%m-%dT%H:%M:%fZ','now','-102 days','+441 minutes'))",
+      "params": [
+        "perf-bal-063",
+        "perf-cer-3",
+        "perf-cer-3-cat-5",
+        "{{adult2}}",
+        "Perf Adult",
+        "{{child2}}",
+        "Perf Child Two"
+      ]
+    },
+    {
+      "sql": "INSERT INTO app_awards_night__ballots (id, ceremony_id, category_id, member_id, member_name, nominee_member_id, nominee_name, reason, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-103 days','+448 minutes'), strftime('%Y-%m-%dT%H:%M:%fZ','now','-103 days','+448 minutes'))",
+      "params": [
+        "perf-bal-064",
+        "perf-cer-3",
+        "perf-cer-3-cat-5",
+        "{{child2}}",
+        "Perf Child Two",
+        "{{partner}}",
+        "Perf Partner",
+        "Changed the whole week."
+      ]
+    },
+    {
+      "sql": "INSERT INTO app_awards_night__ballots (id, ceremony_id, category_id, member_id, member_name, nominee_member_id, nominee_name, reason, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-104 days','+455 minutes'), strftime('%Y-%m-%dT%H:%M:%fZ','now','-104 days','+455 minutes'))",
+      "params": [
+        "perf-bal-065",
+        "perf-cer-3",
+        "perf-cer-3-cat-6",
+        "{{me}}",
+        "Perf Admin",
+        "{{child}}",
+        "Perf Child",
+        "It happened twice, actually."
+      ]
+    },
+    {
+      "sql": "INSERT INTO app_awards_night__ballots (id, ceremony_id, category_id, member_id, member_name, nominee_member_id, nominee_name, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-103 days','+462 minutes'), strftime('%Y-%m-%dT%H:%M:%fZ','now','-103 days','+462 minutes'))",
+      "params": [
+        "perf-bal-066",
+        "perf-cer-3",
+        "perf-cer-3-cat-6",
+        "{{partner}}",
+        "Perf Partner",
+        "{{child2}}",
+        "Perf Child Two"
+      ]
+    },
+    {
+      "sql": "INSERT INTO app_awards_night__ballots (id, ceremony_id, category_id, member_id, member_name, nominee_member_id, nominee_name, reason, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-104 days','+469 minutes'), strftime('%Y-%m-%dT%H:%M:%fZ','now','-104 days','+469 minutes'))",
+      "params": [
+        "perf-bal-067",
+        "perf-cer-3",
+        "perf-cer-3-cat-6",
+        "{{child}}",
+        "Perf Child",
+        "{{partner}}",
+        "Perf Partner",
+        "Nobody else even came close."
+      ]
+    },
+    {
+      "sql": "INSERT INTO app_awards_night__ballots (id, ceremony_id, category_id, member_id, member_name, nominee_member_id, nominee_name, reason, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-103 days','+476 minutes'), strftime('%Y-%m-%dT%H:%M:%fZ','now','-103 days','+476 minutes'))",
+      "params": [
+        "perf-bal-068",
+        "perf-cer-3",
+        "perf-cer-3-cat-6",
+        "{{child2}}",
+        "Perf Child Two",
+        "{{adult2}}",
+        "Perf Adult",
+        "Deserves a trophy."
+      ]
+    },
+    {
+      "sql": "INSERT INTO app_awards_night__ceremonies (id, title, subtitle, status, created_by_id, created_by_name, created_at, reveal_date, revealed_at, archived_at) VALUES (?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-160 days','+0 minutes'), ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-152 days','+600 minutes'), strftime('%Y-%m-%dT%H:%M:%fZ','now','-122 days','+0 minutes'))",
+      "params": [
+        "perf-cer-4",
+        "Spring Cleaning Champions",
+        "Somebody had to win",
+        "archived",
+        "{{adult2}}",
+        "Perf Adult",
+        "{{date:-152}}"
+      ]
+    },
+    {
+      "sql": "INSERT INTO app_awards_night__categories (id, ceremony_id, title, description, nominee_type, sort_order, created_by_id, created_at) VALUES (?, ?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-160 days','+1 minutes'))",
+      "params": [
+        "perf-cer-4-cat-1",
+        "perf-cer-4",
+        "Most Likely to Lose the Remote",
+        "One nominee each",
+        "member",
+        0,
+        "{{adult2}}"
+      ]
+    },
+    {
+      "sql": "INSERT INTO app_awards_night__categories (id, ceremony_id, title, nominee_type, sort_order, created_by_id, created_at) VALUES (?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-160 days','+2 minutes'))",
+      "params": [
+        "perf-cer-4-cat-2",
+        "perf-cer-4",
+        "Best Snack Decision of the Year",
+        "text",
+        1,
+        "{{adult2}}"
+      ]
+    },
+    {
+      "sql": "INSERT INTO app_awards_night__categories (id, ceremony_id, title, description, nominee_type, sort_order, created_by_id, created_at) VALUES (?, ?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-160 days','+3 minutes'))",
+      "params": [
+        "perf-cer-4-cat-3",
+        "perf-cer-4",
+        "Most Improved Chore",
+        "Name the chore, not the person",
+        "text",
+        2,
+        "{{adult2}}"
+      ]
+    },
+    {
+      "sql": "INSERT INTO app_awards_night__categories (id, ceremony_id, title, description, nominee_type, sort_order, created_by_id, created_at) VALUES (?, ?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-160 days','+4 minutes'))",
+      "params": [
+        "perf-cer-4-cat-4",
+        "perf-cer-4",
+        "Funniest Moment",
+        "Describe it in a sentence",
+        "text",
+        3,
+        "{{adult2}}"
+      ]
+    },
+    {
+      "sql": "INSERT INTO app_awards_night__categories (id, ceremony_id, title, description, nominee_type, sort_order, created_by_id, created_at) VALUES (?, ?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-160 days','+5 minutes'))",
+      "params": [
+        "perf-cer-4-cat-5",
+        "perf-cer-4",
+        "Kindest Helper",
+        "Who showed up for someone else?",
+        "member",
+        4,
+        "{{adult2}}"
+      ]
+    },
+    {
+      "sql": "INSERT INTO app_awards_night__categories (id, ceremony_id, title, nominee_type, sort_order, created_by_id, created_at) VALUES (?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-160 days','+6 minutes'))",
+      "params": [
+        "perf-cer-4-cat-6",
+        "perf-cer-4",
+        "Best Playlist DJ",
+        "member",
+        5,
+        "{{adult2}}"
+      ]
+    },
+    {
+      "sql": "INSERT INTO app_awards_night__ballots (id, ceremony_id, category_id, member_id, member_name, nominee_member_id, nominee_name, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-159 days','+483 minutes'), strftime('%Y-%m-%dT%H:%M:%fZ','now','-159 days','+483 minutes'))",
+      "params": [
+        "perf-bal-069",
+        "perf-cer-4",
+        "perf-cer-4-cat-1",
+        "{{me}}",
+        "Perf Admin",
+        "{{child2}}",
+        "Perf Child Two"
+      ]
+    },
+    {
+      "sql": "INSERT INTO app_awards_night__ballots (id, ceremony_id, category_id, member_id, member_name, nominee_member_id, nominee_name, reason, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-158 days','+490 minutes'), strftime('%Y-%m-%dT%H:%M:%fZ','now','-158 days','+490 minutes'))",
+      "params": [
+        "perf-bal-070",
+        "perf-cer-4",
+        "perf-cer-4-cat-1",
+        "{{partner}}",
+        "Perf Partner",
+        "{{me}}",
+        "Perf Admin",
+        "It happened twice, actually."
+      ]
+    },
+    {
+      "sql": "INSERT INTO app_awards_night__ballots (id, ceremony_id, category_id, member_id, member_name, nominee_member_id, nominee_name, reason, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-157 days','+497 minutes'), strftime('%Y-%m-%dT%H:%M:%fZ','now','-157 days','+497 minutes'))",
+      "params": [
+        "perf-bal-071",
+        "perf-cer-4",
+        "perf-cer-4-cat-1",
+        "{{adult2}}",
+        "Perf Adult",
+        "{{partner}}",
+        "Perf Partner",
+        "Still laughing about it."
+      ]
+    },
+    {
+      "sql": "INSERT INTO app_awards_night__ballots (id, ceremony_id, category_id, member_id, member_name, nominee_member_id, nominee_name, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-159 days','+504 minutes'), strftime('%Y-%m-%dT%H:%M:%fZ','now','-159 days','+504 minutes'))",
+      "params": [
+        "perf-bal-072",
+        "perf-cer-4",
+        "perf-cer-4-cat-1",
+        "{{child}}",
+        "Perf Child",
+        "{{adult2}}",
+        "Perf Adult"
+      ]
+    },
+    {
+      "sql": "INSERT INTO app_awards_night__ballots (id, ceremony_id, category_id, member_id, member_name, nominee_member_id, nominee_name, reason, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-158 days','+511 minutes'), strftime('%Y-%m-%dT%H:%M:%fZ','now','-158 days','+511 minutes'))",
+      "params": [
+        "perf-bal-073",
+        "perf-cer-4",
+        "perf-cer-4-cat-1",
+        "{{child2}}",
+        "Perf Child Two",
+        "{{child}}",
+        "Perf Child",
+        "Deserves a trophy."
+      ]
+    },
+    {
+      "sql": "INSERT INTO app_awards_night__ballots (id, ceremony_id, category_id, member_id, member_name, nominee_name, reason, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-159 days','+518 minutes'), strftime('%Y-%m-%dT%H:%M:%fZ','now','-159 days','+518 minutes'))",
+      "params": [
+        "perf-bal-074",
+        "perf-cer-4",
+        "perf-cer-4-cat-2",
+        "{{me}}",
+        "Perf Admin",
+        "When the dog stole the sandwich",
+        "Changed the whole week."
+      ]
+    },
+    {
+      "sql": "INSERT INTO app_awards_night__ballots (id, ceremony_id, category_id, member_id, member_name, nominee_name, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-158 days','+525 minutes'), strftime('%Y-%m-%dT%H:%M:%fZ','now','-158 days','+525 minutes'))",
+      "params": [
+        "perf-bal-075",
+        "perf-cer-4",
+        "perf-cer-4-cat-2",
+        "{{partner}}",
+        "Perf Partner",
+        "Popcorn with hot sauce"
+      ]
+    },
+    {
+      "sql": "INSERT INTO app_awards_night__ballots (id, ceremony_id, category_id, member_id, member_name, nominee_name, reason, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-157 days','+532 minutes'), strftime('%Y-%m-%dT%H:%M:%fZ','now','-157 days','+532 minutes'))",
+      "params": [
+        "perf-bal-076",
+        "perf-cer-4",
+        "perf-cer-4-cat-2",
+        "{{adult2}}",
+        "Perf Adult",
+        "Dishwasher loading, finally",
+        "Still laughing about it."
+      ]
+    },
+    {
+      "sql": "INSERT INTO app_awards_night__ballots (id, ceremony_id, category_id, member_id, member_name, nominee_name, reason, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-159 days','+539 minutes'), strftime('%Y-%m-%dT%H:%M:%fZ','now','-159 days','+539 minutes'))",
+      "params": [
+        "perf-bal-077",
+        "perf-cer-4",
+        "perf-cer-4-cat-2",
+        "{{child}}",
+        "Perf Child",
+        "The tent collapsing at 2am",
+        "Nobody else even came close."
+      ]
+    },
+    {
+      "sql": "INSERT INTO app_awards_night__ballots (id, ceremony_id, category_id, member_id, member_name, nominee_name, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-158 days','+546 minutes'), strftime('%Y-%m-%dT%H:%M:%fZ','now','-158 days','+546 minutes'))",
+      "params": [
+        "perf-bal-078",
+        "perf-cer-4",
+        "perf-cer-4-cat-2",
+        "{{child2}}",
+        "Perf Child Two",
+        "Taking the bins out"
+      ]
+    },
+    {
+      "sql": "INSERT INTO app_awards_night__ballots (id, ceremony_id, category_id, member_id, member_name, nominee_name, reason, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-159 days','+553 minutes'), strftime('%Y-%m-%dT%H:%M:%fZ','now','-159 days','+553 minutes'))",
+      "params": [
+        "perf-bal-079",
+        "perf-cer-4",
+        "perf-cer-4-cat-3",
+        "{{me}}",
+        "Perf Admin",
+        "Folding laundry without being asked",
+        "Changed the whole week."
+      ]
+    },
+    {
+      "sql": "INSERT INTO app_awards_night__ballots (id, ceremony_id, category_id, member_id, member_name, nominee_name, reason, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-158 days','+560 minutes'), strftime('%Y-%m-%dT%H:%M:%fZ','now','-158 days','+560 minutes'))",
+      "params": [
+        "perf-bal-080",
+        "perf-cer-4",
+        "perf-cer-4-cat-3",
+        "{{partner}}",
+        "Perf Partner",
+        "The tin of biscuits",
+        "It happened twice, actually."
+      ]
+    },
+    {
+      "sql": "INSERT INTO app_awards_night__ballots (id, ceremony_id, category_id, member_id, member_name, nominee_name, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-157 days','+567 minutes'), strftime('%Y-%m-%dT%H:%M:%fZ','now','-157 days','+567 minutes'))",
+      "params": [
+        "perf-bal-081",
+        "perf-cer-4",
+        "perf-cer-4-cat-3",
+        "{{adult2}}",
+        "Perf Adult",
+        "When the dog stole the sandwich"
+      ]
+    },
+    {
+      "sql": "INSERT INTO app_awards_night__ballots (id, ceremony_id, category_id, member_id, member_name, nominee_name, reason, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-159 days','+574 minutes'), strftime('%Y-%m-%dT%H:%M:%fZ','now','-159 days','+574 minutes'))",
+      "params": [
+        "perf-bal-082",
+        "perf-cer-4",
+        "perf-cer-4-cat-3",
+        "{{child}}",
+        "Perf Child",
+        "Popcorn with hot sauce",
+        "Nobody else even came close."
+      ]
+    },
+    {
+      "sql": "INSERT INTO app_awards_night__ballots (id, ceremony_id, category_id, member_id, member_name, nominee_name, reason, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-159 days','+581 minutes'), strftime('%Y-%m-%dT%H:%M:%fZ','now','-159 days','+581 minutes'))",
+      "params": [
+        "perf-bal-083",
+        "perf-cer-4",
+        "perf-cer-4-cat-4",
+        "{{me}}",
+        "Perf Admin",
+        "The tent collapsing at 2am",
+        "Deserves a trophy."
+      ]
+    },
+    {
+      "sql": "INSERT INTO app_awards_night__ballots (id, ceremony_id, category_id, member_id, member_name, nominee_name, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-158 days','+588 minutes'), strftime('%Y-%m-%dT%H:%M:%fZ','now','-158 days','+588 minutes'))",
+      "params": [
+        "perf-bal-084",
+        "perf-cer-4",
+        "perf-cer-4-cat-4",
+        "{{partner}}",
+        "Perf Partner",
+        "Taking the bins out"
+      ]
+    },
+    {
+      "sql": "INSERT INTO app_awards_night__ballots (id, ceremony_id, category_id, member_id, member_name, nominee_name, reason, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-157 days','+595 minutes'), strftime('%Y-%m-%dT%H:%M:%fZ','now','-157 days','+595 minutes'))",
+      "params": [
+        "perf-bal-085",
+        "perf-cer-4",
+        "perf-cer-4-cat-4",
+        "{{adult2}}",
+        "Perf Adult",
+        "The midnight cheese toastie",
+        "It happened twice, actually."
+      ]
+    },
+    {
+      "sql": "INSERT INTO app_awards_night__ballots (id, ceremony_id, category_id, member_id, member_name, nominee_name, reason, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-158 days','+602 minutes'), strftime('%Y-%m-%dT%H:%M:%fZ','now','-158 days','+602 minutes'))",
+      "params": [
+        "perf-bal-086",
+        "perf-cer-4",
+        "perf-cer-4-cat-4",
+        "{{child2}}",
+        "Perf Child Two",
+        "Folding laundry without being asked",
+        "Still laughing about it."
+      ]
+    },
+    {
+      "sql": "INSERT INTO app_awards_night__ballots (id, ceremony_id, category_id, member_id, member_name, nominee_member_id, nominee_name, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-159 days','+609 minutes'), strftime('%Y-%m-%dT%H:%M:%fZ','now','-159 days','+609 minutes'))",
+      "params": [
+        "perf-bal-087",
+        "perf-cer-4",
+        "perf-cer-4-cat-5",
+        "{{me}}",
+        "Perf Admin",
+        "{{child}}",
+        "Perf Child"
+      ]
+    },
+    {
+      "sql": "INSERT INTO app_awards_night__ballots (id, ceremony_id, category_id, member_id, member_name, nominee_member_id, nominee_name, reason, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-158 days','+616 minutes'), strftime('%Y-%m-%dT%H:%M:%fZ','now','-158 days','+616 minutes'))",
+      "params": [
+        "perf-bal-088",
+        "perf-cer-4",
+        "perf-cer-4-cat-5",
+        "{{partner}}",
+        "Perf Partner",
+        "{{child2}}",
+        "Perf Child Two",
+        "Deserves a trophy."
+      ]
+    },
+    {
+      "sql": "INSERT INTO app_awards_night__ballots (id, ceremony_id, category_id, member_id, member_name, nominee_member_id, nominee_name, reason, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-159 days','+623 minutes'), strftime('%Y-%m-%dT%H:%M:%fZ','now','-159 days','+623 minutes'))",
+      "params": [
+        "perf-bal-089",
+        "perf-cer-4",
+        "perf-cer-4-cat-5",
+        "{{child}}",
+        "Perf Child",
+        "{{partner}}",
+        "Perf Partner",
+        "Changed the whole week."
+      ]
+    },
+    {
+      "sql": "INSERT INTO app_awards_night__ballots (id, ceremony_id, category_id, member_id, member_name, nominee_member_id, nominee_name, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-158 days','+630 minutes'), strftime('%Y-%m-%dT%H:%M:%fZ','now','-158 days','+630 minutes'))",
+      "params": [
+        "perf-bal-090",
+        "perf-cer-4",
+        "perf-cer-4-cat-5",
+        "{{child2}}",
+        "Perf Child Two",
+        "{{adult2}}",
+        "Perf Adult"
+      ]
+    },
+    {
+      "sql": "INSERT INTO app_awards_night__ballots (id, ceremony_id, category_id, member_id, member_name, nominee_member_id, nominee_name, reason, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-159 days','+637 minutes'), strftime('%Y-%m-%dT%H:%M:%fZ','now','-159 days','+637 minutes'))",
+      "params": [
+        "perf-bal-091",
+        "perf-cer-4",
+        "perf-cer-4-cat-6",
+        "{{me}}",
+        "Perf Admin",
+        "{{child2}}",
+        "Perf Child Two",
+        "Still laughing about it."
+      ]
+    },
+    {
+      "sql": "INSERT INTO app_awards_night__ballots (id, ceremony_id, category_id, member_id, member_name, nominee_member_id, nominee_name, reason, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-157 days','+644 minutes'), strftime('%Y-%m-%dT%H:%M:%fZ','now','-157 days','+644 minutes'))",
+      "params": [
+        "perf-bal-092",
+        "perf-cer-4",
+        "perf-cer-4-cat-6",
+        "{{adult2}}",
+        "Perf Adult",
+        "{{partner}}",
+        "Perf Partner",
+        "Nobody else even came close."
+      ]
+    },
+    {
+      "sql": "INSERT INTO app_awards_night__ballots (id, ceremony_id, category_id, member_id, member_name, nominee_member_id, nominee_name, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-159 days','+651 minutes'), strftime('%Y-%m-%dT%H:%M:%fZ','now','-159 days','+651 minutes'))",
+      "params": [
+        "perf-bal-093",
+        "perf-cer-4",
+        "perf-cer-4-cat-6",
+        "{{child}}",
+        "Perf Child",
+        "{{adult2}}",
+        "Perf Adult"
+      ]
+    },
+    {
+      "sql": "INSERT INTO app_awards_night__ballots (id, ceremony_id, category_id, member_id, member_name, nominee_member_id, nominee_name, reason, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-158 days','+658 minutes'), strftime('%Y-%m-%dT%H:%M:%fZ','now','-158 days','+658 minutes'))",
+      "params": [
+        "perf-bal-094",
+        "perf-cer-4",
+        "perf-cer-4-cat-6",
+        "{{child2}}",
+        "Perf Child Two",
+        "{{child}}",
+        "Perf Child",
+        "Changed the whole week."
+      ]
+    },
+    {
+      "sql": "INSERT INTO app_awards_night__ceremonies (id, title, subtitle, status, created_by_id, created_by_name, created_at, reveal_date, revealed_at, archived_at) VALUES (?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-290 days','+0 minutes'), ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-283 days','+600 minutes'), strftime('%Y-%m-%dT%H:%M:%fZ','now','-253 days','+0 minutes'))",
+      "params": [
+        "perf-cer-5",
+        "Family Awards 2025",
+        "Last year's superlatives",
+        "archived",
+        "{{me}}",
+        "Perf Admin",
+        "{{date:-283}}"
+      ]
+    },
+    {
+      "sql": "INSERT INTO app_awards_night__categories (id, ceremony_id, title, description, nominee_type, sort_order, created_by_id, created_at) VALUES (?, ?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-290 days','+1 minutes'))",
+      "params": [
+        "perf-cer-5-cat-1",
+        "perf-cer-5",
+        "Most Likely to Lose the Remote",
+        "One nominee each",
+        "member",
+        0,
+        "{{me}}"
+      ]
+    },
+    {
+      "sql": "INSERT INTO app_awards_night__categories (id, ceremony_id, title, nominee_type, sort_order, created_by_id, created_at) VALUES (?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-290 days','+2 minutes'))",
+      "params": [
+        "perf-cer-5-cat-2",
+        "perf-cer-5",
+        "Best Snack Decision of the Year",
+        "text",
+        1,
+        "{{me}}"
+      ]
+    },
+    {
+      "sql": "INSERT INTO app_awards_night__categories (id, ceremony_id, title, description, nominee_type, sort_order, created_by_id, created_at) VALUES (?, ?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-290 days','+3 minutes'))",
+      "params": [
+        "perf-cer-5-cat-3",
+        "perf-cer-5",
+        "Most Improved Chore",
+        "Name the chore, not the person",
+        "text",
+        2,
+        "{{me}}"
+      ]
+    },
+    {
+      "sql": "INSERT INTO app_awards_night__categories (id, ceremony_id, title, description, nominee_type, sort_order, created_by_id, created_at) VALUES (?, ?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-290 days','+4 minutes'))",
+      "params": [
+        "perf-cer-5-cat-4",
+        "perf-cer-5",
+        "Funniest Moment",
+        "Describe it in a sentence",
+        "text",
+        3,
+        "{{me}}"
+      ]
+    },
+    {
+      "sql": "INSERT INTO app_awards_night__categories (id, ceremony_id, title, description, nominee_type, sort_order, created_by_id, created_at) VALUES (?, ?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-290 days','+5 minutes'))",
+      "params": [
+        "perf-cer-5-cat-5",
+        "perf-cer-5",
+        "Kindest Helper",
+        "Who showed up for someone else?",
+        "member",
+        4,
+        "{{me}}"
+      ]
+    },
+    {
+      "sql": "INSERT INTO app_awards_night__categories (id, ceremony_id, title, nominee_type, sort_order, created_by_id, created_at) VALUES (?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-290 days','+6 minutes'))",
+      "params": [
+        "perf-cer-5-cat-6",
+        "perf-cer-5",
+        "Best Playlist DJ",
+        "member",
+        5,
+        "{{me}}"
+      ]
+    },
+    {
+      "sql": "INSERT INTO app_awards_night__ballots (id, ceremony_id, category_id, member_id, member_name, nominee_member_id, nominee_name, reason, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-289 days','+665 minutes'), strftime('%Y-%m-%dT%H:%M:%fZ','now','-289 days','+665 minutes'))",
+      "params": [
+        "perf-bal-095",
+        "perf-cer-5",
+        "perf-cer-5-cat-1",
+        "{{me}}",
+        "Perf Admin",
+        "{{me}}",
+        "Perf Admin",
+        "It happened twice, actually."
+      ]
+    },
+    {
+      "sql": "INSERT INTO app_awards_night__ballots (id, ceremony_id, category_id, member_id, member_name, nominee_member_id, nominee_name, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-288 days','+672 minutes'), strftime('%Y-%m-%dT%H:%M:%fZ','now','-288 days','+672 minutes'))",
+      "params": [
+        "perf-bal-096",
+        "perf-cer-5",
+        "perf-cer-5-cat-1",
+        "{{partner}}",
+        "Perf Partner",
+        "{{partner}}",
+        "Perf Partner"
+      ]
+    },
+    {
+      "sql": "INSERT INTO app_awards_night__ballots (id, ceremony_id, category_id, member_id, member_name, nominee_member_id, nominee_name, reason, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-287 days','+679 minutes'), strftime('%Y-%m-%dT%H:%M:%fZ','now','-287 days','+679 minutes'))",
+      "params": [
+        "perf-bal-097",
+        "perf-cer-5",
+        "perf-cer-5-cat-1",
+        "{{adult2}}",
+        "Perf Adult",
+        "{{adult2}}",
+        "Perf Adult",
+        "Nobody else even came close."
+      ]
+    },
+    {
+      "sql": "INSERT INTO app_awards_night__ballots (id, ceremony_id, category_id, member_id, member_name, nominee_member_id, nominee_name, reason, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-289 days','+686 minutes'), strftime('%Y-%m-%dT%H:%M:%fZ','now','-289 days','+686 minutes'))",
+      "params": [
+        "perf-bal-098",
+        "perf-cer-5",
+        "perf-cer-5-cat-1",
+        "{{child}}",
+        "Perf Child",
+        "{{child}}",
+        "Perf Child",
+        "Deserves a trophy."
+      ]
+    },
+    {
+      "sql": "INSERT INTO app_awards_night__ballots (id, ceremony_id, category_id, member_id, member_name, nominee_member_id, nominee_name, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-288 days','+693 minutes'), strftime('%Y-%m-%dT%H:%M:%fZ','now','-288 days','+693 minutes'))",
+      "params": [
+        "perf-bal-099",
+        "perf-cer-5",
+        "perf-cer-5-cat-1",
+        "{{child2}}",
+        "Perf Child Two",
+        "{{child2}}",
+        "Perf Child Two"
+      ]
+    },
+    {
+      "sql": "INSERT INTO app_awards_night__ballots (id, ceremony_id, category_id, member_id, member_name, nominee_name, reason, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-289 days','+700 minutes'), strftime('%Y-%m-%dT%H:%M:%fZ','now','-289 days','+700 minutes'))",
+      "params": [
+        "perf-bal-100",
+        "perf-cer-5",
+        "perf-cer-5-cat-2",
+        "{{me}}",
+        "Perf Admin",
+        "Dishwasher loading, finally",
+        "It happened twice, actually."
+      ]
+    },
+    {
+      "sql": "INSERT INTO app_awards_night__ballots (id, ceremony_id, category_id, member_id, member_name, nominee_name, reason, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-288 days','+707 minutes'), strftime('%Y-%m-%dT%H:%M:%fZ','now','-288 days','+707 minutes'))",
+      "params": [
+        "perf-bal-101",
+        "perf-cer-5",
+        "perf-cer-5-cat-2",
+        "{{partner}}",
+        "Perf Partner",
+        "The tent collapsing at 2am",
+        "Still laughing about it."
+      ]
+    },
+    {
+      "sql": "INSERT INTO app_awards_night__ballots (id, ceremony_id, category_id, member_id, member_name, nominee_name, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-287 days','+714 minutes'), strftime('%Y-%m-%dT%H:%M:%fZ','now','-287 days','+714 minutes'))",
+      "params": [
+        "perf-bal-102",
+        "perf-cer-5",
+        "perf-cer-5-cat-2",
+        "{{adult2}}",
+        "Perf Adult",
+        "Taking the bins out"
+      ]
+    },
+    {
+      "sql": "INSERT INTO app_awards_night__ballots (id, ceremony_id, category_id, member_id, member_name, nominee_name, reason, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-289 days','+721 minutes'), strftime('%Y-%m-%dT%H:%M:%fZ','now','-289 days','+721 minutes'))",
+      "params": [
+        "perf-bal-103",
+        "perf-cer-5",
+        "perf-cer-5-cat-2",
+        "{{child}}",
+        "Perf Child",
+        "The midnight cheese toastie",
+        "Deserves a trophy."
+      ]
+    },
+    {
+      "sql": "INSERT INTO app_awards_night__ballots (id, ceremony_id, category_id, member_id, member_name, nominee_name, reason, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-289 days','+728 minutes'), strftime('%Y-%m-%dT%H:%M:%fZ','now','-289 days','+728 minutes'))",
+      "params": [
+        "perf-bal-104",
+        "perf-cer-5",
+        "perf-cer-5-cat-3",
+        "{{me}}",
+        "Perf Admin",
+        "The tin of biscuits",
+        "Changed the whole week."
+      ]
+    },
+    {
+      "sql": "INSERT INTO app_awards_night__ballots (id, ceremony_id, category_id, member_id, member_name, nominee_name, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-288 days','+735 minutes'), strftime('%Y-%m-%dT%H:%M:%fZ','now','-288 days','+735 minutes'))",
+      "params": [
+        "perf-bal-105",
+        "perf-cer-5",
+        "perf-cer-5-cat-3",
+        "{{partner}}",
+        "Perf Partner",
+        "When the dog stole the sandwich"
+      ]
+    },
+    {
+      "sql": "INSERT INTO app_awards_night__ballots (id, ceremony_id, category_id, member_id, member_name, nominee_name, reason, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-287 days','+742 minutes'), strftime('%Y-%m-%dT%H:%M:%fZ','now','-287 days','+742 minutes'))",
+      "params": [
+        "perf-bal-106",
+        "perf-cer-5",
+        "perf-cer-5-cat-3",
+        "{{adult2}}",
+        "Perf Adult",
+        "Popcorn with hot sauce",
+        "Still laughing about it."
+      ]
+    },
+    {
+      "sql": "INSERT INTO app_awards_night__ballots (id, ceremony_id, category_id, member_id, member_name, nominee_name, reason, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-288 days','+749 minutes'), strftime('%Y-%m-%dT%H:%M:%fZ','now','-288 days','+749 minutes'))",
+      "params": [
+        "perf-bal-107",
+        "perf-cer-5",
+        "perf-cer-5-cat-3",
+        "{{child2}}",
+        "Perf Child Two",
+        "Dishwasher loading, finally",
+        "Nobody else even came close."
+      ]
+    },
+    {
+      "sql": "INSERT INTO app_awards_night__ballots (id, ceremony_id, category_id, member_id, member_name, nominee_name, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-289 days','+756 minutes'), strftime('%Y-%m-%dT%H:%M:%fZ','now','-289 days','+756 minutes'))",
+      "params": [
+        "perf-bal-108",
+        "perf-cer-5",
+        "perf-cer-5-cat-4",
+        "{{me}}",
+        "Perf Admin",
+        "Taking the bins out"
+      ]
+    },
+    {
+      "sql": "INSERT INTO app_awards_night__ballots (id, ceremony_id, category_id, member_id, member_name, nominee_name, reason, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-288 days','+763 minutes'), strftime('%Y-%m-%dT%H:%M:%fZ','now','-288 days','+763 minutes'))",
+      "params": [
+        "perf-bal-109",
+        "perf-cer-5",
+        "perf-cer-5-cat-4",
+        "{{partner}}",
+        "Perf Partner",
+        "The midnight cheese toastie",
+        "Changed the whole week."
+      ]
+    },
+    {
+      "sql": "INSERT INTO app_awards_night__ballots (id, ceremony_id, category_id, member_id, member_name, nominee_name, reason, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-289 days','+770 minutes'), strftime('%Y-%m-%dT%H:%M:%fZ','now','-289 days','+770 minutes'))",
+      "params": [
+        "perf-bal-110",
+        "perf-cer-5",
+        "perf-cer-5-cat-4",
+        "{{child}}",
+        "Perf Child",
+        "Folding laundry without being asked",
+        "It happened twice, actually."
+      ]
+    },
+    {
+      "sql": "INSERT INTO app_awards_night__ballots (id, ceremony_id, category_id, member_id, member_name, nominee_name, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-288 days','+777 minutes'), strftime('%Y-%m-%dT%H:%M:%fZ','now','-288 days','+777 minutes'))",
+      "params": [
+        "perf-bal-111",
+        "perf-cer-5",
+        "perf-cer-5-cat-4",
+        "{{child2}}",
+        "Perf Child Two",
+        "The tin of biscuits"
+      ]
+    },
+    {
+      "sql": "INSERT INTO app_awards_night__ballots (id, ceremony_id, category_id, member_id, member_name, nominee_member_id, nominee_name, reason, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-289 days','+784 minutes'), strftime('%Y-%m-%dT%H:%M:%fZ','now','-289 days','+784 minutes'))",
+      "params": [
+        "perf-bal-112",
+        "perf-cer-5",
+        "perf-cer-5-cat-5",
+        "{{me}}",
+        "Perf Admin",
+        "{{child2}}",
+        "Perf Child Two",
+        "Nobody else even came close."
+      ]
+    },
+    {
+      "sql": "INSERT INTO app_awards_night__ballots (id, ceremony_id, category_id, member_id, member_name, nominee_member_id, nominee_name, reason, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-287 days','+791 minutes'), strftime('%Y-%m-%dT%H:%M:%fZ','now','-287 days','+791 minutes'))",
+      "params": [
+        "perf-bal-113",
+        "perf-cer-5",
+        "perf-cer-5-cat-5",
+        "{{adult2}}",
+        "Perf Adult",
+        "{{partner}}",
+        "Perf Partner",
+        "Deserves a trophy."
+      ]
+    },
+    {
+      "sql": "INSERT INTO app_awards_night__ballots (id, ceremony_id, category_id, member_id, member_name, nominee_member_id, nominee_name, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-289 days','+798 minutes'), strftime('%Y-%m-%dT%H:%M:%fZ','now','-289 days','+798 minutes'))",
+      "params": [
+        "perf-bal-114",
+        "perf-cer-5",
+        "perf-cer-5-cat-5",
+        "{{child}}",
+        "Perf Child",
+        "{{adult2}}",
+        "Perf Adult"
+      ]
+    },
+    {
+      "sql": "INSERT INTO app_awards_night__ballots (id, ceremony_id, category_id, member_id, member_name, nominee_member_id, nominee_name, reason, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-288 days','+805 minutes'), strftime('%Y-%m-%dT%H:%M:%fZ','now','-288 days','+805 minutes'))",
+      "params": [
+        "perf-bal-115",
+        "perf-cer-5",
+        "perf-cer-5-cat-5",
+        "{{child2}}",
+        "Perf Child Two",
+        "{{child}}",
+        "Perf Child",
+        "It happened twice, actually."
+      ]
+    },
+    {
+      "sql": "INSERT INTO app_awards_night__ballots (id, ceremony_id, category_id, member_id, member_name, nominee_member_id, nominee_name, reason, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-288 days','+812 minutes'), strftime('%Y-%m-%dT%H:%M:%fZ','now','-288 days','+812 minutes'))",
+      "params": [
+        "perf-bal-116",
+        "perf-cer-5",
+        "perf-cer-5-cat-6",
+        "{{partner}}",
+        "Perf Partner",
+        "{{partner}}",
+        "Perf Partner",
+        "Still laughing about it."
+      ]
+    },
+    {
+      "sql": "INSERT INTO app_awards_night__ballots (id, ceremony_id, category_id, member_id, member_name, nominee_member_id, nominee_name, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-287 days','+819 minutes'), strftime('%Y-%m-%dT%H:%M:%fZ','now','-287 days','+819 minutes'))",
+      "params": [
+        "perf-bal-117",
+        "perf-cer-5",
+        "perf-cer-5-cat-6",
+        "{{adult2}}",
+        "Perf Adult",
+        "{{adult2}}",
+        "Perf Adult"
+      ]
+    },
+    {
+      "sql": "INSERT INTO app_awards_night__ballots (id, ceremony_id, category_id, member_id, member_name, nominee_member_id, nominee_name, reason, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-289 days','+826 minutes'), strftime('%Y-%m-%dT%H:%M:%fZ','now','-289 days','+826 minutes'))",
+      "params": [
+        "perf-bal-118",
+        "perf-cer-5",
+        "perf-cer-5-cat-6",
+        "{{child}}",
+        "Perf Child",
+        "{{child}}",
+        "Perf Child",
+        "Deserves a trophy."
+      ]
+    },
+    {
+      "sql": "INSERT INTO app_awards_night__ballots (id, ceremony_id, category_id, member_id, member_name, nominee_member_id, nominee_name, reason, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-288 days','+833 minutes'), strftime('%Y-%m-%dT%H:%M:%fZ','now','-288 days','+833 minutes'))",
+      "params": [
+        "perf-bal-119",
+        "perf-cer-5",
+        "perf-cer-5-cat-6",
+        "{{child2}}",
+        "Perf Child Two",
+        "{{child2}}",
+        "Perf Child Two",
+        "Changed the whole week."
+      ]
+    }
+  ]
+}
