@@ -323,7 +323,8 @@ async function refresh() {
     render();
     handleDeepLink();
   } catch (e) {
-    if (loaded) error = e.message;
+    console.error("[awards-night] refresh failed", e);
+    if (loaded) error = "Couldn’t refresh the awards nights.";
     else loadFailed = true;
     render();
   }
@@ -345,6 +346,16 @@ function handleDeepLink() {
 function clearMessages() { error = ""; notice = ""; }
 function showError(m) { error = m; notice = ""; render(); }
 function showNotice(m) { notice = m; error = ""; render(); }
+// A form that could not be saved stays as typed and says so in its own error
+// line: redrawing the page would reset the fields. Falls back to the page's
+// line when the form is gone.
+function formError(form, m) {
+  const line = form?.isConnected ? form.querySelector("[data-form-error]") : null;
+  if (!line) return showError(m);
+  line.textContent = m;
+  line.hidden = false;
+}
+const FORM_ERROR_LINE = `<div class="error" data-form-error role="alert" hidden></div>`;
 
 // ── Mutations ─────────────────────────────────────────────────────────────────
 async function createCeremony(form) {
@@ -355,10 +366,11 @@ async function createCeremony(form) {
   const cleanCats = draftCats
     .map((c, i) => ({ ...c, title: c.title.trim(), sort_order: i }))
     .filter(c => c.title);
-  if (!title) { form.title.focus(); return showError("Give your awards night a title."); }
-  if (!cleanCats.length) return showError("Add at least one award category.");
+  if (!title) { form.title.focus(); return formError(form, "Give your awards night a title."); }
+  if (!cleanCats.length) return formError(form, "Add at least one award category.");
 
   const btn = document.querySelector('#create-form [type="submit"]');
+  if (btn?.disabled) return;
   if (btn) { btn.disabled = true; btn.textContent = "Creating…"; }
 
   const cer = {
@@ -396,14 +408,16 @@ async function createCeremony(form) {
     showNotice("Awards night created. Invite everyone to cast their picks.");
     publishEvent("awards_night.ceremony_created", cer.id, { title: cer.title });
   } catch (e) {
+    console.error("[awards-night] create failed", e);
     if (btn) { btn.disabled = false; btn.textContent = "Create awards night"; }
-    showError(e.message);
+    formError(form, "Couldn’t create the awards night — try again.");
   }
 }
 
 async function saveBallot(categoryId, { nomineeMemberId, nomineeName, reason }) {
   const cer = selectedCeremony();
-  if (!canCast()) return showError("Voting has closed for this ceremony.");
+  const form = modalEl?.querySelector("#ballot-form");
+  if (!canCast()) { closeModal(); return showError("Voting has closed for this ceremony."); }
   const existing = myBallot(categoryId);
   const now = nowIso();
   try {
@@ -445,7 +459,10 @@ async function saveBallot(categoryId, { nomineeMemberId, nomineeName, reason }) 
     closeModal();
     showNotice("Your pick is sealed until the ceremony.");
   } catch (e) {
-    showError(e.message);
+    console.error("[awards-night] save pick failed", e);
+    const btn = form?.querySelector('[type="submit"]');
+    if (btn) { btn.disabled = false; btn.textContent = btn.dataset.label ?? btn.textContent; }
+    formError(form, "Couldn’t save your pick — try again.");
   }
 }
 
@@ -479,7 +496,8 @@ async function revealCeremony(id) {
       url: hubAppUrl(APP_ID, { ceremonyId: id }),
     }).catch(() => {});
   } catch (e) {
-    showError(e.message);
+    console.error("[awards-night] reveal failed", e);
+    showError("Couldn’t reveal the winners — try again.");
   }
 }
 
@@ -499,7 +517,8 @@ async function archiveCeremony(id) {
     if (idx !== -1) ceremonies[idx] = { ...ceremonies[idx], status: STATUS.ARCHIVED, archived_at: now };
     showNotice("Ceremony archived.");
   } catch (e) {
-    showError(e.message);
+    console.error("[awards-night] archive failed", e);
+    showError("Couldn’t archive the ceremony — try again.");
   }
 }
 
@@ -515,6 +534,7 @@ async function addCategory(form) {
     nominee_type, sort_order, created_by_id: currentMember.id, created_at: nowIso(),
   };
   const btn = document.querySelector('#add-cat-form [type="submit"]');
+  if (btn?.disabled) return;
   if (btn) { btn.disabled = true; btn.textContent = "Adding…"; }
   try {
     if (DB) {
@@ -530,7 +550,8 @@ async function addCategory(form) {
     showNotice("Category added.");
   } catch (e) {
     if (btn) { btn.disabled = false; btn.textContent = "Add category"; }
-    showError(e.message);
+    console.error("[awards-night] add category failed", e);
+    formError(form, "Couldn’t add the category — try again.");
   }
 }
 
@@ -558,7 +579,8 @@ async function deleteCategory(categoryId) {
     ballots = ballots.filter(b => b.category_id !== categoryId);
     showNotice("Category removed.");
   } catch (e) {
-    showError(e.message);
+    console.error("[awards-night] remove category failed", e);
+    showError("Couldn’t remove the category — try again.");
   }
 }
 
@@ -618,6 +640,7 @@ function openBallotModal(categoryId) {
         <label for="ballot-reason">Why? <span class="muted" style="text-transform:none;letter-spacing:0">(optional)</span></label>
         <textarea id="ballot-reason" placeholder="A line to read out at the ceremony">${esc(reason)}</textarea>
       </div>
+      ${FORM_ERROR_LINE}
       <div class="modal-actions">
         <button type="button" class="btn btn-ghost" data-close-modal>Cancel</button>
         <button type="submit" class="btn">${existing ? "Update pick" : "Seal my pick"}</button>
@@ -634,14 +657,15 @@ async function submitBallot() {
   let nomineeName = "";
   if (cat.nominee_type === "member") {
     nomineeMemberId = modalState.selectedMemberId;
-    if (!nomineeMemberId) return showError("Pick someone first.");
+    if (!nomineeMemberId) return formError(modalEl?.querySelector("#ballot-form"), "Pick someone first.");
     nomineeName = memberName(nomineeMemberId);
   } else {
     nomineeName = modalEl?.querySelector("#nominee-text")?.value.trim() ?? "";
     if (!nomineeName) { modalEl?.querySelector("#nominee-text")?.focus(); return; }
   }
   const btn = modalEl?.querySelector('#ballot-form [type="submit"]');
-  if (btn) { btn.disabled = true; btn.textContent = "Saving…"; }
+  if (btn?.disabled) return;
+  if (btn) { btn.dataset.label = btn.textContent; btn.disabled = true; btn.textContent = "Saving…"; }
   await saveBallot(cat.id, { nomineeMemberId, nomineeName, reason });
 }
 
@@ -660,6 +684,7 @@ function openAddCategoryModal() {
           <option value="text">Write-in answer</option>
         </select>
       </div>
+      ${FORM_ERROR_LINE}
       <div class="modal-actions">
         <button type="button" class="btn btn-ghost" data-close-modal>Cancel</button>
         <button type="submit" class="btn">Add category</button>
@@ -884,6 +909,7 @@ function renderCreate() {
             </div>`).join("")}
         </div>
       </div>
+      ${FORM_ERROR_LINE}
       <div class="actions">
         <button class="btn btn-ghost" type="button" data-add-draft>Add category</button>
         <button class="btn" type="submit">Create awards night</button>
