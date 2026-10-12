@@ -176,6 +176,8 @@
       background: var(--surface, var(--card, #fff)); color: var(--text, inherit);
     }
     .search-input:focus { outline: none; border-color: var(--accent, #6366f1); }
+    .load-error { margin: 0 0 12px; padding: 10px 14px; border-radius: 10px; background: var(--hub-tint-danger, #fee2e2); color: var(--hub-tint-danger-fg, #b91c1c); font-size: 0.9rem; display: flex; gap: 10px; align-items: center; justify-content: space-between; }
+    .load-error-retry { background: none; border: 1px solid currentColor; border-radius: 8px; padding: 5px 10px; font: inherit; font-weight: 600; color: inherit; cursor: pointer; flex-shrink: 0; }
   </style>
   <base href="/run/awards-night/">
 </head>
@@ -208,6 +210,8 @@ let view = "list";
 let searchQ = "";       // in-app search (see logic.js searchableFields)
 let error = "";
 let notice = "";
+let loaded = false;     // a load has succeeded at least once
+let loadFailed = false; // the first load failed: banner instead of the list
 let draftCats = [
   { title: "Most likely to lose their keys", nominee_type: "member" },
   { title: "Best chef in the house", nominee_type: "member" },
@@ -242,8 +246,8 @@ async function dbq(sql, params = []) {
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({ sql, params }),
   });
-  const json = await res.json();
-  if (json.error) throw new Error(json.error);
+  const json = await res.json().catch(() => null);
+  if (!res.ok || !json || typeof json !== "object" || json.error) throw new Error(json?.error || "Couldn’t reach the hub. Try again.");
   return json;
 }
 
@@ -257,10 +261,16 @@ async function loadMembers() {
       { id: "demo-4", name: "Riley", role: "child" },
     ];
   } else {
+    // A roster that cannot be read fails the first load. A later refresh
+    // keeps the roster it already has.
     try {
       const res = await fetch(`${CONTEXT}?keys=family.members`);
-      members = ((await res.json())["family.members"]) ?? [];
-    } catch { members = []; }
+      const json = await res.json().catch(() => null);
+      if (!res.ok || !json || typeof json !== "object" || json.error) throw new Error("Couldn’t reach the hub. Try again.");
+      // The hub answers 200 and names a key it could not resolve in $errors: that read failed too.
+      if (Array.isArray(json.$errors) && json.$errors.includes("family.members")) throw new Error("Couldn’t reach the hub. Try again.");
+      members = json["family.members"] ?? [];
+    } catch (e) { if (!loaded) throw e; }
   }
   memberMap = new Map(members.map(m => [m.id, m]));
   currentMember = HUB_MEMBER ?? members[0] ?? { id: "guest", name: "Guest", role: "adult" };
@@ -307,11 +317,14 @@ async function refresh() {
   try {
     await loadMembers();
     await loadData();
+    loaded = true;
+    loadFailed = false;
     if (selectedId && !ceremonies.some(c => c.id === selectedId)) selectedId = null;
     render();
     handleDeepLink();
   } catch (e) {
-    error = e.message;
+    if (loaded) error = e.message;
+    else loadFailed = true;
     render();
   }
 }
@@ -396,12 +409,19 @@ async function saveBallot(categoryId, { nomineeMemberId, nomineeName, reason }) 
   try {
     if (existing) {
       if (DB) {
-        await dbq(
+        const res = await dbq(
           `UPDATE app_awards_night__ballots
            SET nominee_member_id = ?, nominee_name = ?, reason = ?, updated_at = ?
            WHERE id = ?`,
           [nomineeMemberId, nomineeName, reason, now, existing.id]
         );
+        // A pick is frozen once the ceremony is revealed; the hub then answers
+        // 200 with nothing changed, so re-read rather than show a saved pick.
+        if (res.changed === 0) {
+          closeModal();
+          await refresh();
+          return showError("Your pick was not changed. Voting has closed for this ceremony.");
+        }
       }
       const idx = ballots.findIndex(b => b.id === existing.id);
       if (idx !== -1) ballots[idx] = { ...ballots[idx], nominee_member_id: nomineeMemberId, nominee_name: nomineeName, reason, updated_at: now };
@@ -440,7 +460,12 @@ async function revealCeremony(id) {
   const now = nowIso();
   try {
     if (DB) {
-      await dbq("UPDATE app_awards_night__ceremonies SET status = 'revealed', revealed_at = ? WHERE id = ?", [now, id]);
+      const res = await dbq("UPDATE app_awards_night__ceremonies SET status = 'revealed', revealed_at = ? WHERE id = ?", [now, id]);
+      // An archived ceremony is frozen: nothing changed, so nothing to announce.
+      if (res.changed === 0) {
+        await refresh();
+        return showError("This ceremony can no longer be changed.");
+      }
       await reloadBallots();
     }
     const idx = ceremonies.findIndex(c => c.id === id);
@@ -678,6 +703,15 @@ function renderCeremonyCard(cer) {
 }
 
 function renderList() {
+  if (loadFailed) return `
+    <div class="topbar">
+      <div>
+        <h1>${glyph("trophy")} Awards Night</h1>
+        <p class="muted tiny">Family superlatives &amp; chapter awards — sealed until the ceremony.</p>
+      </div>
+    </div>
+    <div class="load-error" data-testid="load-error" role="alert"><span>Couldn’t load the awards nights.</span>
+      <button type="button" class="load-error-retry" data-testid="load-retry">Try again</button></div>`;
   return `
     <div class="topbar">
       <div>
@@ -883,7 +917,7 @@ document.addEventListener("click", (e) => {
   if (t.matches("[data-back]")) { selectedId = null; clearMessages(); render(); return; }
   if (t.matches("[data-view-create]")) { view = "create"; clearMessages(); render(); return; }
   if (t.matches("[data-view-list]")) { view = "list"; clearMessages(); render(); return; }
-  if (t.matches("[data-refresh]")) { refresh(); return; }
+  if (t.matches("[data-refresh]") || t.matches('[data-testid="load-retry"]')) { refresh(); return; }
   if (t.matches("[data-close-modal]")) { closeModal(); return; }
   if (t.matches("[data-add-draft]")) { addDraft(); return; }
   if (t.hasAttribute("data-remove-draft")) { removeDraft(Number(t.getAttribute("data-remove-draft"))); return; }
