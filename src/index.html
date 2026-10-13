@@ -424,17 +424,18 @@ async function createCeremony(form) {
         })),
       ]);
     }
-    ceremonies = [cer, ...ceremonies];
-    categories = [...categories, ...cats];
-    selectedId = cer.id;
-    view = "list";
-    showNotice("Awards night created. Invite everyone to cast their picks.");
-    publishEvent("awards_night.ceremony_created", cer.id, { title: cer.title });
   } catch (e) {
     console.error("[awards-night] create failed", e);
     if (btn) { btn.disabled = false; btn.textContent = "Create awards night"; }
-    formError(form, "Couldn’t create the awards night — try again.");
+    return formError(form, "Couldn’t create the awards night — try again.");
   }
+  // The create is stored: nothing below may report it as failed.
+  ceremonies = [cer, ...ceremonies];
+  categories = [...categories, ...cats];
+  selectedId = cer.id;
+  view = "list";
+  showNotice("Awards night created. Invite everyone to cast their picks.");
+  publishEvent("awards_night.ceremony_created", cer.id, { title: cer.title });
 }
 
 async function saveBallot(categoryId, { nomineeMemberId, nomineeName, reason }) {
@@ -947,8 +948,17 @@ function render() {
 }
 
 // ── Draft-category editing (create form) ──────────────────────────────────────
-function addDraft() { if (draftCats.length >= MAX_CATS) return; draftCats.push({ title: "", nominee_type: "member" }); render(); }
-function removeDraft(i) { draftCats.splice(i, 1); if (!draftCats.length) addDraft(); else render(); }
+// Redrawing the form for a changed category list keeps what was typed above it.
+function redrawDrafts() {
+  const names = ["title", "subtitle", "reveal_date"];
+  const old = document.getElementById("create-form");
+  const kept = old ? names.map(n => old.elements[n].value) : null;
+  render();
+  const form = document.getElementById("create-form");
+  if (kept && form) names.forEach((n, i) => { form.elements[n].value = kept[i]; });
+}
+function addDraft() { if (draftCats.length >= MAX_CATS) return; draftCats.push({ title: "", nominee_type: "member" }); redrawDrafts(); }
+function removeDraft(i) { draftCats.splice(i, 1); if (!draftCats.length) addDraft(); else redrawDrafts(); }
 function updateDraft(i, field, value) { if (draftCats[i]) draftCats[i][field] = value; }
 
 // ── Event wiring ──────────────────────────────────────────────────────────────

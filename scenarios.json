@@ -105,6 +105,45 @@
           "expect": { "status": 200, "rowCount": 1, "rowsContain": [{ "nominee_name": "First Pick" }] }
         }
       ]
+    },
+    {
+      "name": "creating an awards night stores the ceremony and its categories as one batch, ceremony first",
+      "members": { "a": "adult", "b": "adult" },
+      "steps": [
+        {
+          "action": "batch",
+          "as": "a",
+          "statements": [
+            {
+              "sql": "INSERT INTO app_awards_night__ceremonies (id, title, subtitle, status, created_by_id, created_by_name, created_at, reveal_date, revealed_at, archived_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, '', '')",
+              "params": ["cer1", "Family Awards", "Cast your picks", "voting", "{{a}}", "A", "2026-01-01T00:00:00Z", "2026-12-31"]
+            },
+            {
+              "sql": "INSERT INTO app_awards_night__categories (id, ceremony_id, title, description, nominee_type, sort_order, created_by_id, created_at) VALUES (?, ?, ?, '', ?, ?, ?, ?)",
+              "params": ["cat1", "cer1", "Funniest", "member", 0, "{{a}}", "2026-01-01T00:00:00Z"]
+            },
+            {
+              "sql": "INSERT INTO app_awards_night__categories (id, ceremony_id, title, description, nominee_type, sort_order, created_by_id, created_at) VALUES (?, ?, ?, '', ?, ?, ?, ?)",
+              "params": ["cat2", "cer1", "Moment of the year", "text", 1, "{{a}}", "2026-01-01T00:00:00Z"]
+            }
+          ],
+          "expect": { "status": 200, "changed": [1, 1, 1] }
+        },
+        {
+          "action": "db",
+          "as": "b",
+          "sql": "SELECT id, title FROM app_awards_night__ceremonies WHERE id = ?",
+          "params": ["cer1"],
+          "expect": { "status": 200, "rowCount": 1, "rowsContain": [{ "id": "cer1", "title": "Family Awards" }] }
+        },
+        {
+          "action": "db",
+          "as": "b",
+          "sql": "SELECT id, nominee_type FROM app_awards_night__categories WHERE ceremony_id = ? ORDER BY sort_order ASC",
+          "params": ["cer1"],
+          "expect": { "status": 200, "rowCount": 2, "rowsContain": [{ "id": "cat1", "nominee_type": "member" }, { "id": "cat2", "nominee_type": "text" }] }
+        }
+      ]
     }
   ]
 }
