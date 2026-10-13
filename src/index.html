@@ -251,6 +251,26 @@ async function dbq(sql, params = []) {
   return json;
 }
 
+// Atomic multi-statement form of /api/db: a batch lands whole or not at all.
+// /api/db caps a batch at 25 statements; creating an awards night is the
+// ceremony row plus one row per category, so the form stops at MAX_CATS and
+// the create is always ONE batch.
+const MAX_BATCH = 25;
+const MAX_CATS = MAX_BATCH - 1;
+
+async function dbBatch(statements) {
+  if (!DB || !statements.length) return [];
+  const res = await fetch(DB, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ statements }),
+  });
+  const json = await res.json().catch(() => null);
+  // A batch that ran answers with one result per statement; anything else is not a save.
+  if (!res.ok || !json || typeof json !== "object" || json.error || !Array.isArray(json.results)) throw new Error(json?.error || "Couldn’t reach the hub. Try again.");
+  return json.results;
+}
+
 // ── Loading ───────────────────────────────────────────────────────────────────
 async function loadMembers() {
   if (!CONTEXT) {
@@ -368,6 +388,7 @@ async function createCeremony(form) {
     .filter(c => c.title);
   if (!title) { form.title.focus(); return formError(form, "Give your awards night a title."); }
   if (!cleanCats.length) return formError(form, "Add at least one award category.");
+  if (cleanCats.length > MAX_CATS) return formError(form, `An awards night can start with up to ${MAX_CATS} categories. Add more after it is created.`);
 
   const btn = document.querySelector('#create-form [type="submit"]');
   if (btn?.disabled) return;
@@ -386,20 +407,22 @@ async function createCeremony(form) {
 
   try {
     if (DB) {
-      await dbq(
-        `INSERT INTO app_awards_night__ceremonies
-         (id, title, subtitle, status, created_by_id, created_by_name, created_at, reveal_date, revealed_at, archived_at)
-         VALUES (?, ?, ?, ?, ?, ?, ?, ?, '', '')`,
-        [cer.id, cer.title, cer.subtitle, cer.status, cer.created_by_id, cer.created_by_name, cer.created_at, cer.reveal_date]
-      );
-      for (const c of cats) {
-        await dbq(
-          `INSERT INTO app_awards_night__categories
-           (id, ceremony_id, title, description, nominee_type, sort_order, created_by_id, created_at)
-           VALUES (?, ?, ?, '', ?, ?, ?, ?)`,
-          [c.id, c.ceremony_id, c.title, c.nominee_type, c.sort_order, c.created_by_id, c.created_at]
-        );
-      }
+      // One batch: the ceremony and every category land together or not at
+      // all, so a refused create leaves nothing behind for the retry to duplicate.
+      await dbBatch([
+        {
+          sql: `INSERT INTO app_awards_night__ceremonies
+                (id, title, subtitle, status, created_by_id, created_by_name, created_at, reveal_date, revealed_at, archived_at)
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?, '', '')`,
+          params: [cer.id, cer.title, cer.subtitle, cer.status, cer.created_by_id, cer.created_by_name, cer.created_at, cer.reveal_date],
+        },
+        ...cats.map(c => ({
+          sql: `INSERT INTO app_awards_night__categories
+                (id, ceremony_id, title, description, nominee_type, sort_order, created_by_id, created_at)
+                VALUES (?, ?, ?, '', ?, ?, ?, ?)`,
+          params: [c.id, c.ceremony_id, c.title, c.nominee_type, c.sort_order, c.created_by_id, c.created_at],
+        })),
+      ]);
     }
     ceremonies = [cer, ...ceremonies];
     categories = [...categories, ...cats];
@@ -911,7 +934,7 @@ function renderCreate() {
       </div>
       ${FORM_ERROR_LINE}
       <div class="actions">
-        <button class="btn btn-ghost" type="button" data-add-draft>Add category</button>
+        <button class="btn btn-ghost" type="button" data-add-draft ${draftCats.length >= MAX_CATS ? "disabled" : ""}>Add category</button>
         <button class="btn" type="submit">Create awards night</button>
       </div>
     </form>`;
@@ -924,7 +947,7 @@ function render() {
 }
 
 // ── Draft-category editing (create form) ──────────────────────────────────────
-function addDraft() { draftCats.push({ title: "", nominee_type: "member" }); render(); }
+function addDraft() { if (draftCats.length >= MAX_CATS) return; draftCats.push({ title: "", nominee_type: "member" }); render(); }
 function removeDraft(i) { draftCats.splice(i, 1); if (!draftCats.length) addDraft(); else render(); }
 function updateDraft(i, field, value) { if (draftCats[i]) draftCats[i][field] = value; }
 
