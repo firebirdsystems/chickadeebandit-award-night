@@ -191,7 +191,7 @@ import { esc, memberColor, initial, hubConfirm, sendHubNotification, hubAppUrl, 
 import {
   STATUS, isVoting, isRevealed, canManage as _canManage, canCastBallot as _canCastBallot,
   myBallotFor, myProgress, tallyCategory, searchableFields, failureLine,
-  isUnknownOutcome, pickRetryOutcome, createRetryDiffers,
+  isUnknownOutcome, pickRetryOutcome, createRetryDiffers, ceremonyCreateStatements, MAX_CATS,
 } from "./logic.js";
 
 const CONTEXT    = window.__CONTEXT_URL ?? "";
@@ -271,11 +271,9 @@ async function dbq(sql, params = []) {
 }
 
 // Atomic multi-statement form of /api/db: a batch lands whole or not at all.
-// /api/db caps a batch at 25 statements; creating an awards night is the
-// ceremony row plus one row per category, so the form stops at MAX_CATS and
-// the create is always ONE batch.
-const MAX_BATCH = 25;
-const MAX_CATS = MAX_BATCH - 1;
+// /api/db caps a batch at 25 statements; creating an awards night packs its
+// categories several to an INSERT (logic.js ceremonyCreateStatements), and the
+// form stops at MAX_CATS so the create is always ONE batch.
 
 async function dbBatch(statements) {
   if (!DB || !statements.length) return [];
@@ -438,20 +436,7 @@ async function createCeremony(form) {
     if (DB) {
       // One batch: the ceremony and every category land together or not at
       // all, so a refused create leaves nothing behind for the retry to duplicate.
-      await dbBatch([
-        {
-          sql: `INSERT INTO app_awards_night__ceremonies
-                (id, title, subtitle, status, created_by_id, created_by_name, created_at, reveal_date, revealed_at, archived_at)
-                VALUES (?, ?, ?, ?, ?, ?, ?, ?, '', '')`,
-          params: [cer.id, cer.title, cer.subtitle, cer.status, cer.created_by_id, cer.created_by_name, cer.created_at, cer.reveal_date],
-        },
-        ...cats.map(c => ({
-          sql: `INSERT INTO app_awards_night__categories
-                (id, ceremony_id, title, description, nominee_type, sort_order, created_by_id, created_at)
-                VALUES (?, ?, ?, '', ?, ?, ?, ?)`,
-          params: [c.id, c.ceremony_id, c.title, c.nominee_type, c.sort_order, c.created_by_id, c.created_at],
-        })),
-      ]);
+      await dbBatch(ceremonyCreateStatements(cer, cats));
     }
   } catch (e) {
     console.error("[awards-night] create failed", e);
@@ -612,6 +597,7 @@ async function revealCeremony(id) {
   if (!ok) return;
   const now = nowIso();
   let refused = false;
+  let reread = false; // a lost answer's refresh() already read the picks after the reveal
   try {
     if (DB) {
       // Guarded on 'voting': a stale tab must not re-reveal (and re-announce) a
@@ -628,6 +614,7 @@ async function revealCeremony(id) {
       && ceremonies.some(c => c.id === id && c.status === STATUS.REVEALED && c.revealed_at === now);
     if (!landed) return showError(failureLine(e, { action: "reveal the winners", thing: "awards night" }));
     selectedId = id;
+    reread = true;
   }
   // Already revealed or archived elsewhere, or gone: nothing changed, so nothing to announce.
   if (refused) {
@@ -642,11 +629,14 @@ async function revealCeremony(id) {
     return showError(failureLine(null, { action: "reveal the winners", thing: "awards night", found: true }));
   }
   // The reveal is stored: nothing below may report it as failed.
-  await reloadBallots().catch(e => console.error("[awards-night] reload picks failed", e));
+  // The ceremony is drawn from the saved values even when the picks cannot be
+  // re-read; then the tallies hold only the picks this page could already see,
+  // so the success line says so.
+  const picksLoaded = reread || await reloadBallots().then(() => true, e => { console.error("[awards-night] reload picks failed", e); return false; });
   const idx = ceremonies.findIndex(c => c.id === id);
   if (idx !== -1) ceremonies[idx] = { ...ceremonies[idx], status: STATUS.REVEALED, revealed_at: now };
   const cer = ceremonies[idx];
-  showNotice("🏆 The winners are revealed!");
+  showNotice(picksLoaded ? "🏆 The winners are revealed!" : "🏆 The winners are revealed, but everyone’s picks couldn’t be loaded — refresh to see the results.");
   publishEvent("awards_night.ceremony_revealed", id, { title: cer?.title });
   sendHubNotification({
     title: "🏆 Awards Night results are in!",

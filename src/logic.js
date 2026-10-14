@@ -146,6 +146,36 @@ export function createRetryDiffers(stored, form) {
     || (have[i].nominee_type ?? "") !== (w.nominee_type ?? "") || Number(have[i].sort_order) !== Number(w.sort_order));
 }
 
+// ── Creating an awards night ─────────────────────────────────────────────────
+// The ceremony and its categories go to the hub as ONE batch, so a failure
+// part-way leaves nothing behind and a retry cannot make a second night. The hub
+// takes 25 statements a batch and 100 bound values a statement: a category row
+// binds 7, so 14 rows share an INSERT and up to 24 such INSERTs follow the
+// ceremony's (336 categories). The form stops well short of that.
+export const CAT_ROWS_PER_INSERT = 14;
+export const MAX_CATS = 100;
+
+/** The statements that create `cer` with `cats`, or null when there are too many categories. */
+export function ceremonyCreateStatements(cer, cats) {
+  if (cats.length > MAX_CATS) return null;
+  const statements = [{
+    sql: `INSERT INTO app_awards_night__ceremonies
+          (id, title, subtitle, status, created_by_id, created_by_name, created_at, reveal_date, revealed_at, archived_at)
+          VALUES (?, ?, ?, ?, ?, ?, ?, ?, '', '')`,
+    params: [cer.id, cer.title, cer.subtitle, cer.status, cer.created_by_id, cer.created_by_name, cer.created_at, cer.reveal_date],
+  }];
+  for (let i = 0; i < cats.length; i += CAT_ROWS_PER_INSERT) {
+    const rows = cats.slice(i, i + CAT_ROWS_PER_INSERT);
+    statements.push({
+      sql: `INSERT INTO app_awards_night__categories
+            (id, ceremony_id, title, description, nominee_type, sort_order, created_by_id, created_at)
+            VALUES ${rows.map(() => "(?, ?, ?, '', ?, ?, ?, ?)").join(", ")}`,
+      params: rows.flatMap(c => [c.id, c.ceremony_id, c.title, c.nominee_type, c.sort_order, c.created_by_id, c.created_at]),
+    });
+  }
+  return statements;
+}
+
 /**
  * The line a failed write shows ("Refused, gone, or failed" in the app-template
  * guide): "try again" only when retrying can work. `action` and `thing` are the

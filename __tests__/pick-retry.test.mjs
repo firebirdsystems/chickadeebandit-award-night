@@ -1,5 +1,8 @@
 import { describe, it, expect } from "vitest";
-import { isUnknownOutcome, pickRetryOutcome, createRetryDiffers } from "../src/logic.js";
+import {
+  isUnknownOutcome, pickRetryOutcome, createRetryDiffers,
+  ceremonyCreateStatements, MAX_CATS, CAT_ROWS_PER_INSERT,
+} from "../src/logic.js";
 
 const err = (props) => Object.assign(new Error("hub text"), props);
 
@@ -62,5 +65,46 @@ describe("createRetryDiffers", () => {
     expect(createRetryDiffers(stored({}, [cats[0], { ...cats[1], title: "Old" }]), form)).toBe(true);
     expect(createRetryDiffers(stored({}, [cats[0]]), form)).toBe(true);
     expect(createRetryDiffers(stored(), { ...form, cats: [cats[0]] })).toBe(true);
+  });
+});
+
+describe("ceremonyCreateStatements", () => {
+  const cer = {
+    id: "cer-1", title: "Awards", subtitle: "", status: "voting", created_by_id: "m1",
+    created_by_name: "Alex", created_at: "2026-01-01T00:00:00.000Z", reveal_date: "",
+  };
+  const catsOf = n => Array.from({ length: n }, (_, i) => ({
+    id: `cat-${i}`, ceremony_id: "cer-1", title: `Award ${i}`, nominee_type: i % 2 ? "text" : "member",
+    sort_order: i, created_by_id: "m1", created_at: "2026-01-01T00:00:00.000Z",
+  }));
+
+  it("fits the largest night in one batch within the hub's limits", () => {
+    const statements = ceremonyCreateStatements(cer, catsOf(MAX_CATS));
+    expect(statements.length).toBeLessThanOrEqual(25);
+    for (const s of statements) {
+      expect(s.params.length).toBeLessThanOrEqual(100);
+      expect(s.sql.split("?").length - 1).toBe(s.params.length);
+    }
+    expect(CAT_ROWS_PER_INSERT * 7).toBeLessThanOrEqual(100);
+    expect(24 * CAT_ROWS_PER_INSERT).toBeGreaterThanOrEqual(MAX_CATS);
+  });
+
+  it("writes every category once, in order, under its pinned id", () => {
+    const cats = catsOf(CAT_ROWS_PER_INSERT + 2);
+    const statements = ceremonyCreateStatements(cer, cats);
+    expect(statements).toHaveLength(3);
+    expect(statements[0].sql).toMatch(/INSERT INTO app_awards_night__ceremonies/);
+    expect(statements[0].params[0]).toBe("cer-1");
+    const rows = statements.slice(1).flatMap(s => {
+      expect(s.sql).toMatch(/INSERT INTO app_awards_night__categories/);
+      const out = [];
+      for (let i = 0; i < s.params.length; i += 7) out.push(s.params.slice(i, i + 7));
+      return out;
+    });
+    expect(rows).toEqual(cats.map(c => [c.id, "cer-1", c.title, c.nominee_type, c.sort_order, "m1", c.created_at]));
+  });
+
+  it("refuses more categories than the form allows", () => {
+    expect(ceremonyCreateStatements(cer, catsOf(MAX_CATS + 1))).toBeNull();
   });
 });
