@@ -98,3 +98,53 @@ export function tallyCategory(ballots, category) {
 export function searchableFields(item) {
   return [item.title, item.subtitle];
 }
+
+/**
+ * A write whose outcome the page cannot know: no status (the answer was lost),
+ * a 400 (the hub's answer for a write that timed out after it may have been
+ * stored) or a 5xx other than 507. The caller re-reads before saying anything.
+ */
+export function isUnknownOutcome(e) {
+  const s = e?.status;
+  return !s || s === 400 || (s >= 500 && s !== 507);
+}
+
+/**
+ * After a new pick's save failed with an unknown outcome or a 403 (the
+ * one-pick-per-category limit), the re-read decides what happened. `stored` is
+ * the member's stored pick for the category (or null); `pinnedId` the id this
+ * dialog sent on every attempt. Returns:
+ *   "saved"   — the pick is stored as submitted (by this dialog, or matching it)
+ *   "differs" — this dialog's pick is stored, but as first entered
+ *   "other"   — a different pick is stored (another device): do not overwrite it
+ *   "none"    — no pick is stored
+ */
+export function pickRetryOutcome(stored, { pinnedId, nomineeMemberId, nomineeName, reason }) {
+  if (!stored) return "none";
+  const same = (stored.nominee_member_id ?? "") === (nomineeMemberId ?? "")
+    && (nomineeMemberId ? true : (stored.nominee_name ?? "") === (nomineeName ?? ""))
+    && (stored.reason ?? "") === (reason ?? "");
+  if (same) return "saved";
+  return stored.id === pinnedId ? "differs" : "other";
+}
+
+/**
+ * The line a failed write shows ("Refused, gone, or failed" in the app-template
+ * guide): "try again" only when retrying can work. `action` and `thing` are the
+ * app's own words. `found` is the caller's re-read after a write that changed
+ * nothing: false = the row is gone, true = it is still there, null = the
+ * re-read failed (say neither removed nor changed). A row still there after a
+ * plain `WHERE id = ?` write means the row policy refused it; only a `guarded`
+ * write (one with a state condition) can have been "changed by someone else".
+ * Decided from the error's `status` / `code`, never from the hub's text.
+ */
+export function failureLine(e, { action, thing, found, guarded = false } = {}) {
+  if (e?.forUser) return e.message;
+  if (e?.code === "UNIQUE_CONSTRAINT" || /UNIQUE constraint failed/i.test(String(e?.message ?? ""))) return `That ${thing} already exists.`;
+  if (e?.status === 403 || (found === true && !guarded)) return `You don’t have permission to ${action}.`;
+  if (e?.status === 507) return "The household’s storage is full — free up space first.";
+  if (found === null) return `Couldn’t ${action} — try again.`;
+  if (found === false || (found === undefined && e?.status === 404)) return `This ${thing} has been removed.`;
+  if (found === true || e?.status === 409) return `This ${thing} was changed by someone else — check it first.`;
+  return `Couldn’t ${action} — try again.`;
+}

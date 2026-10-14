@@ -107,6 +107,47 @@
       ]
     },
     {
+      "name": "once revealed, the ceremony's categories are frozen: an adult cannot edit or remove one",
+      "members": { "a": "adult", "b": "adult" },
+      "steps": [
+        {
+          "action": "seedRaw",
+          "sql": "INSERT INTO app_awards_night__ceremonies (id, title, status, created_by_id, created_by_name, created_at) VALUES ('cer1', 'Superlatives', 'voting', ?, 'A', '2026-01-01T00:00:00Z')",
+          "params": ["{{a}}"]
+        },
+        {
+          "action": "seedRaw",
+          "sql": "INSERT INTO app_awards_night__categories (id, ceremony_id, title, nominee_type, created_by_id, created_at) VALUES ('cat1', 'cer1', 'Most Likely', 'text', ?, '2026-01-01T00:00:00Z')",
+          "params": ["{{a}}"]
+        },
+        {
+          "action": "seedRaw",
+          "sql": "INSERT INTO app_awards_night__categories (id, ceremony_id, title, nominee_type, created_by_id, created_at) VALUES ('cat2', 'cer1', 'Funniest', 'text', ?, '2026-01-01T00:00:00Z')",
+          "params": ["{{a}}"]
+        },
+        {
+          "action": "seedRaw",
+          "sql": "UPDATE app_awards_night__ceremonies SET status = 'revealed', revealed_at = '2026-01-03T00:00:00Z' WHERE id = 'cer1'"
+        },
+        {
+          "action": "batch",
+          "as": "b",
+          "statements": [
+            { "sql": "UPDATE app_awards_night__categories SET title = ? WHERE id = ?", "params": ["Renamed", "cat1"] },
+            { "sql": "DELETE FROM app_awards_night__categories WHERE id = ?", "params": ["cat2"] }
+          ],
+          "expect": { "status": 200, "changed": [0, 0] }
+        },
+        {
+          "action": "db",
+          "as": "a",
+          "sql": "SELECT id, title FROM app_awards_night__categories WHERE ceremony_id = ?",
+          "params": ["cer1"],
+          "expect": { "status": 200, "rowCount": 2, "rowsContain": [{ "id": "cat1", "title": "Most Likely" }, { "id": "cat2", "title": "Funniest" }] }
+        }
+      ]
+    },
+    {
       "name": "creating an awards night stores the ceremony and its categories as one batch, ceremony first",
       "members": { "a": "adult", "b": "adult" },
       "steps": [

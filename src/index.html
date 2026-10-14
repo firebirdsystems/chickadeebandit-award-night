@@ -190,7 +190,8 @@
 import { esc, memberColor, initial, hubConfirm, sendHubNotification, hubAppUrl, searchMatch, hubToday as todayDate, glyph } from "/hub-sdk.js";
 import {
   STATUS, isVoting, isRevealed, canManage as _canManage, canCastBallot as _canCastBallot,
-  myBallotFor, myProgress, tallyCategory, searchableFields,
+  myBallotFor, myProgress, tallyCategory, searchableFields, failureLine,
+  isUnknownOutcome, pickRetryOutcome,
 } from "./logic.js";
 
 const CONTEXT    = window.__CONTEXT_URL ?? "";
@@ -251,7 +252,10 @@ async function dbq(sql, params = []) {
     body: JSON.stringify({ sql, params }),
   });
   const json = await res.json().catch(() => null);
-  if (!res.ok || !json || typeof json !== "object" || json.error) throw new Error(json?.error || "Couldn’t reach the hub. Try again.");
+  // `status` and `code` ride on the error: failureLine() picks the line from them.
+  if (!res.ok || !json || typeof json !== "object" || json.error) {
+    throw Object.assign(new Error(json?.error || "Couldn’t reach the hub. Try again."), { status: res.status, code: json?.code });
+  }
   return json;
 }
 
@@ -271,7 +275,9 @@ async function dbBatch(statements) {
   });
   const json = await res.json().catch(() => null);
   // A batch that ran answers with one result per statement; anything else is not a save.
-  if (!res.ok || !json || typeof json !== "object" || json.error || !Array.isArray(json.results)) throw new Error(json?.error || "Couldn’t reach the hub. Try again.");
+  if (!res.ok || !json || typeof json !== "object" || json.error || !Array.isArray(json.results)) {
+    throw Object.assign(new Error(json?.error || "Couldn’t reach the hub. Try again."), { status: res.status, code: json?.code });
+  }
   return json.results;
 }
 
@@ -336,6 +342,8 @@ async function loadData() {
   ballots = ballotRows.rows;
 }
 
+// Answers whether the re-read worked: a caller deciding a refusal from it must
+// not read a stale list as stored state.
 async function refresh() {
   clearMessages();
   try {
@@ -346,11 +354,13 @@ async function refresh() {
     if (selectedId && !ceremonies.some(c => c.id === selectedId)) selectedId = null;
     render();
     handleDeepLink();
+    return true;
   } catch (e) {
     console.error("[awards-night] refresh failed", e);
     if (loaded) error = "Couldn’t refresh the awards nights.";
     else loadFailed = true;
     render();
+    return false;
   }
 }
 
@@ -431,7 +441,7 @@ async function createCeremony(form) {
   } catch (e) {
     console.error("[awards-night] create failed", e);
     if (btn) { btn.disabled = false; btn.textContent = "Create awards night"; }
-    return formError(form, "Couldn’t create the awards night — try again.");
+    return formError(form, failureLine(e, { action: "create the awards night", thing: "awards night" }));
   }
   // The create is stored: nothing below may report it as failed.
   ceremonies = [cer, ...ceremonies];
@@ -445,7 +455,9 @@ async function createCeremony(form) {
 
 async function saveBallot(categoryId, { nomineeMemberId, nomineeName, reason }) {
   const cer = selectedCeremony();
+  const dialog = modalEl; // close only this dialog, not one opened since
   const form = modalEl?.querySelector("#ballot-form");
+  const state = modalState; // this dialog's state: the pinned id never reaches another dialog
   if (!canCast()) { closeModal(); return showError("Voting has closed for this ceremony."); }
   const existing = myBallot(categoryId);
   const now = nowIso();
@@ -463,8 +475,11 @@ async function saveBallot(categoryId, { nomineeMemberId, nomineeName, reason }) 
         refused = res.changed === 0;
       }
     } else {
+      // The new pick's id is minted once per dialog and sent on every attempt,
+      // so a retry after a lost answer can find the pick that landed.
+      if (state && state.categoryId === categoryId && !state.pickId) state.pickId = uid("bal");
       b = {
-        id: uid("bal"), ceremony_id: cer.id, category_id: categoryId,
+        id: state?.categoryId === categoryId ? state.pickId : uid("bal"), ceremony_id: cer.id, category_id: categoryId,
         member_id: currentMember.id, member_name: currentMember.name,
         nominee_member_id: nomineeMemberId, nominee_name: nomineeName, reason,
         created_at: now, updated_at: now,
@@ -480,16 +495,63 @@ async function saveBallot(categoryId, { nomineeMemberId, nomineeName, reason }) 
     }
   } catch (e) {
     console.error("[awards-night] save pick failed", e);
-    const btn = form?.querySelector('[type="submit"]');
-    if (btn) { btn.disabled = false; btn.textContent = btn.dataset.label ?? btn.textContent; }
-    return formError(form, "Couldn’t save your pick — try again.");
+    // The button comes back only on the paths that keep this dialog open, once
+    // the outcome is known: a press during the re-read must not start a second save.
+    const restore = () => {
+      const btn = form?.querySelector('[type="submit"]');
+      if (btn) { btn.disabled = false; btn.textContent = btn.dataset.label ?? btn.textContent; }
+    };
+    // A new pick is refused (403) once voting has closed or once a pick for this
+    // category is stored (one per member); an earlier attempt may also have landed
+    // with its answer lost. Re-read and decide from what is stored.
+    if (DB && cer && (e?.status === 403 || (!existing && isUnknownOutcome(e)))) {
+      const reread = await refresh();
+      const stored = ceremonies.find(c => c.id === cer.id);
+      // refresh() re-applies a launch link; stay on the ceremony the message is about.
+      if (stored) { selectedId = cer.id; render(); }
+      if (!reread) { restore(); return formError(form, "Couldn’t save your pick — try again."); }
+      if (!stored) {
+        if (modalEl === dialog) closeModal();
+        return showError("This awards night has been removed.");
+      }
+      const outcome = existing ? "none" : pickRetryOutcome(myBallot(categoryId), { pinnedId: b?.id, nomineeMemberId, nomineeName, reason });
+      // The pick landed as submitted: the success path, which could not have run.
+      if (outcome === "saved") {
+        if (modalEl === dialog) closeModal();
+        return showNotice("Your pick is sealed until the ceremony.");
+      }
+      if (!canCast()) {
+        if (modalEl === dialog) closeModal();
+        return showError(outcome === "differs"
+          ? "Your pick was saved as first entered. Voting has closed for this ceremony."
+          : "Your pick was not saved. Voting has closed for this ceremony.");
+      }
+      // A stored pick that is not what this dialog holds: show it rather than
+      // let the next press overwrite it.
+      if (outcome === "differs" || outcome === "other") {
+        const msg = outcome === "differs"
+          ? "Saved as first entered — check it and update what changed."
+          : "You already have a pick in this category — check it first.";
+        if (modalEl !== dialog) return showError(msg);
+        openBallotModal(categoryId);
+        return formError(modalEl?.querySelector("#ballot-form"), msg);
+      }
+    }
+    restore();
+    return formError(form, failureLine(e, { action: "save your pick", thing: "pick" }));
   }
   // A pick is frozen once the ceremony is revealed; the hub then answers
   // 200 with nothing changed, so re-read rather than show a saved pick.
   if (refused) {
-    closeModal();
-    await refresh();
-    return showError("Your pick was not changed. Voting has closed for this ceremony.");
+    if (modalEl === dialog) closeModal();
+    if (!(await refresh())) return showError("Couldn’t save your pick — try again.");
+    // refresh() re-applies a launch link; stay on the ceremony the message is about.
+    if (!cer || !ceremonies.some(c => c.id === cer.id)) return showError("This awards night has been removed.");
+    selectedId = cer.id;
+    if (!ballots.some(x => x.id === existing.id)) return showError("This pick has been removed.");
+    if (!canCast()) return showError("Your pick was not changed. Voting has closed for this ceremony.");
+    // A plain `WHERE id = ?` update with the pick still there: the row policy refused it.
+    return showError(failureLine(null, { action: "save your pick", thing: "pick", found: true }));
   }
   // The pick is stored: nothing below may report it as failed.
   if (b) ballots = [...ballots, b];
@@ -497,7 +559,7 @@ async function saveBallot(categoryId, { nomineeMemberId, nomineeName, reason }) 
     const idx = ballots.findIndex(x => x.id === existing.id);
     if (idx !== -1) ballots[idx] = { ...ballots[idx], nominee_member_id: nomineeMemberId, nominee_name: nomineeName, reason, updated_at: now };
   }
-  closeModal();
+  if (modalEl === dialog) closeModal();
   showNotice("Your pick is sealed until the ceremony.");
 }
 
@@ -513,17 +575,32 @@ async function revealCeremony(id) {
   let refused = false;
   try {
     if (DB) {
-      const res = await dbq("UPDATE app_awards_night__ceremonies SET status = 'revealed', revealed_at = ? WHERE id = ?", [now, id]);
+      // Guarded on 'voting': a stale tab must not re-reveal (and re-announce) a
+      // ceremony another adult already revealed.
+      const res = await dbq("UPDATE app_awards_night__ceremonies SET status = 'revealed', revealed_at = ? WHERE id = ? AND status = 'voting'", [now, id]);
       refused = res.changed === 0;
     }
   } catch (e) {
     console.error("[awards-night] reveal failed", e);
-    return showError("Couldn’t reveal the winners — try again.");
+    // The answer was lost: the reveal may have landed. Its stamp is this
+    // attempt's, so a stored `revealed_at` equal to it means it did: run the
+    // success path (announce) once, rather than let a retry read "already revealed".
+    const landed = DB && isUnknownOutcome(e) && (await refresh())
+      && ceremonies.some(c => c.id === id && c.status === STATUS.REVEALED && c.revealed_at === now);
+    if (!landed) return showError(failureLine(e, { action: "reveal the winners", thing: "awards night" }));
+    selectedId = id;
   }
-  // An archived ceremony is frozen: nothing changed, so nothing to announce.
+  // Already revealed or archived elsewhere, or gone: nothing changed, so nothing to announce.
   if (refused) {
-    await refresh();
-    return showError("This ceremony can no longer be changed.");
+    if (!(await refresh())) return showError("Couldn’t reveal the winners — try again.");
+    // refresh() re-applies a launch link; stay on the ceremony the message is about.
+    const stored = ceremonies.find(c => c.id === id);
+    if (!stored) return showError("This awards night has been removed.");
+    selectedId = id;
+    if (stored.status === STATUS.REVEALED) return showError("The winners have already been revealed.");
+    if (stored.status === STATUS.ARCHIVED) return showError("This ceremony can no longer be changed.");
+    // Still voting, so the guard did not stop it: the row policy refused it.
+    return showError(failureLine(null, { action: "reveal the winners", thing: "awards night", found: true }));
   }
   // The reveal is stored: nothing below may report it as failed.
   await reloadBallots().catch(e => console.error("[awards-night] reload picks failed", e));
@@ -557,14 +634,18 @@ async function archiveCeremony(id) {
     }
   } catch (e) {
     console.error("[awards-night] archive failed", e);
-    return showError("Couldn’t archive the ceremony — try again.");
+    return showError(failureLine(e, { action: "archive the ceremony", thing: "awards night" }));
   }
   // Already archived elsewhere, or gone: nothing changed, so show what is stored.
   if (refused) {
-    await refresh();
+    if (!(await refresh())) return showError("Couldn’t archive the ceremony — try again.");
     // refresh() re-applies a launch link; stay on the ceremony the message is about.
-    if (ceremonies.some(c => c.id === id)) selectedId = id;
-    return showError("This ceremony can no longer be changed.");
+    const stored = ceremonies.find(c => c.id === id);
+    if (!stored) return showError("This awards night has been removed.");
+    selectedId = id;
+    if (stored.status === STATUS.ARCHIVED) return showError("This ceremony can no longer be changed.");
+    // A plain `WHERE id = ?` update with the ceremony not yet archived: the row policy refused it.
+    return showError(failureLine(null, { action: "archive the ceremony", thing: "awards night", found: true }));
   }
   // The archive is stored: nothing below may report it as failed.
   const idx = ceremonies.findIndex(c => c.id === id);
@@ -583,6 +664,7 @@ async function addCategory(form) {
     id: uid("cat"), ceremony_id: cer.id, title, description: "",
     nominee_type, sort_order, created_by_id: currentMember.id, created_at: nowIso(),
   };
+  const dialog = modalEl; // close only this dialog, not one opened since
   const btn = document.querySelector('#add-cat-form [type="submit"]');
   if (btn?.disabled) return;
   if (btn) { btn.disabled = true; btn.textContent = "Adding…"; }
@@ -598,11 +680,26 @@ async function addCategory(form) {
   } catch (e) {
     if (btn) { btn.disabled = false; btn.textContent = "Add category"; }
     console.error("[awards-night] add category failed", e);
-    return formError(form, "Couldn’t add the category — try again.");
+    // Categories are frozen (403) once the ceremony is revealed or archived:
+    // a tab drawn before that re-reads and says so.
+    if (e?.status === 403 && DB) {
+      const reread = await refresh();
+      const stored = ceremonies.find(c => c.id === cer.id);
+      // refresh() re-applies a launch link; stay on the ceremony the message is about.
+      if (stored) { selectedId = cer.id; render(); }
+      if (reread && (!stored || !isVoting(stored))) {
+        if (modalEl === dialog) closeModal();
+        if (!stored) return showError("This awards night has been removed.");
+        return showError(stored.status === STATUS.REVEALED
+          ? "Winners have been revealed, so categories can no longer change."
+          : "This ceremony can no longer be changed.");
+      }
+    }
+    return formError(form, failureLine(e, { action: "add a category", thing: "category" }));
   }
   // The category is stored: nothing below may report it as failed.
   categories = [...categories, cat];
-  closeModal();
+  if (modalEl === dialog) closeModal();
   showNotice("Category added.");
 }
 
@@ -616,6 +713,7 @@ async function deleteCategory(categoryId) {
     destructive: true,
   });
   if (!ok) return;
+  let refused = false;
   try {
     if (DB) {
       // Only the category row is deleted. We intentionally do NOT try to delete
@@ -624,11 +722,25 @@ async function deleteCategory(categoryId) {
       // anyway. Orphans are inert — no surviving category references them, so
       // they never render or tally — and freeing them cleanly would require a
       // trusted endpoint. Removing the category is enough for the UI.
-      await dbq("DELETE FROM app_awards_night__categories WHERE id = ?", [categoryId]);
+      const res = await dbq("DELETE FROM app_awards_night__categories WHERE id = ?", [categoryId]);
+      refused = res.changed === 0;
     }
   } catch (e) {
     console.error("[awards-night] remove category failed", e);
-    return showError("Couldn’t remove the category — try again.");
+    return showError(failureLine(e, { action: "remove the category", thing: "category" }));
+  }
+  // Categories freeze once the ceremony is revealed: nothing changed, so show what is stored.
+  if (refused) {
+    if (!(await refresh())) return showError("Couldn’t remove the category — try again.");
+    // refresh() re-applies a launch link; stay on the ceremony the message is about.
+    const stored = ceremonies.find(c => c.id === cer.id);
+    if (!stored) return showError("This awards night has been removed.");
+    selectedId = cer.id;
+    if (!categories.some(c => c.id === categoryId)) return showError("This category has been removed.");
+    if (stored.status === STATUS.REVEALED) return showError("Winners have been revealed, so categories can no longer change.");
+    if (stored.status === STATUS.ARCHIVED) return showError("This ceremony can no longer be changed.");
+    // A plain `WHERE id = ?` delete with the category still there: the row policy refused it.
+    return showError(failureLine(null, { action: "remove the category", thing: "category", found: true }));
   }
   // The removal is stored: nothing below may report it as failed.
   categories = categories.filter(c => c.id !== categoryId);

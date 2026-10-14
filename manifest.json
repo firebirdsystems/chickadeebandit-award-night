@@ -41,7 +41,13 @@
       }
     },
     "categories": {
-      "kind": "adult_writable"
+      "kind": "adult_writable",
+      "frozen_when": {
+        "parent_table": "ceremonies",
+        "fk_column": "ceremony_id",
+        "status_column": "status",
+        "locked_values": ["revealed", "archived"]
+      }
     },
     "ballots": {
       "kind": "sealed_until",
