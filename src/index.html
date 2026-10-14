@@ -212,11 +212,15 @@ let error = "";
 let notice = "";
 let loaded = false;     // a load has succeeded at least once
 let loadFailed = false; // the first load failed: banner instead of the list
-let draftCats = [
-  { title: "Most likely to lose their keys", nominee_type: "member" },
-  { title: "Best chef in the house", nominee_type: "member" },
-  { title: "Moment of the year", nominee_type: "text" },
-];
+// The starter categories a new create form opens with.
+function starterCats() {
+  return [
+    { title: "Most likely to lose their keys", nominee_type: "member" },
+    { title: "Best chef in the house", nominee_type: "member" },
+    { title: "Moment of the year", nominee_type: "text" },
+  ];
+}
+let draftCats = starterCats();
 
 // ── Small utils ───────────────────────────────────────────────────────────────
 function nowIso() { return new Date().toISOString(); }
@@ -434,6 +438,7 @@ async function createCeremony(form) {
   categories = [...categories, ...cats];
   selectedId = cer.id;
   view = "list";
+  draftCats = starterCats(); // the next create form starts fresh
   showNotice("Awards night created. Invite everyone to cast their picks.");
   publishEvent("awards_night.ceremony_created", cer.id, { title: cer.title });
 }
@@ -444,6 +449,8 @@ async function saveBallot(categoryId, { nomineeMemberId, nomineeName, reason }) 
   if (!canCast()) { closeModal(); return showError("Voting has closed for this ceremony."); }
   const existing = myBallot(categoryId);
   const now = nowIso();
+  let b = null;
+  let refused = false;
   try {
     if (existing) {
       if (DB) {
@@ -453,18 +460,10 @@ async function saveBallot(categoryId, { nomineeMemberId, nomineeName, reason }) 
            WHERE id = ?`,
           [nomineeMemberId, nomineeName, reason, now, existing.id]
         );
-        // A pick is frozen once the ceremony is revealed; the hub then answers
-        // 200 with nothing changed, so re-read rather than show a saved pick.
-        if (res.changed === 0) {
-          closeModal();
-          await refresh();
-          return showError("Your pick was not changed. Voting has closed for this ceremony.");
-        }
+        refused = res.changed === 0;
       }
-      const idx = ballots.findIndex(b => b.id === existing.id);
-      if (idx !== -1) ballots[idx] = { ...ballots[idx], nominee_member_id: nomineeMemberId, nominee_name: nomineeName, reason, updated_at: now };
     } else {
-      const b = {
+      b = {
         id: uid("bal"), ceremony_id: cer.id, category_id: categoryId,
         member_id: currentMember.id, member_name: currentMember.name,
         nominee_member_id: nomineeMemberId, nominee_name: nomineeName, reason,
@@ -478,16 +477,28 @@ async function saveBallot(categoryId, { nomineeMemberId, nomineeName, reason }) 
           [b.id, b.ceremony_id, b.category_id, b.member_id, b.member_name, b.nominee_member_id, b.nominee_name, b.reason, b.created_at, b.updated_at]
         );
       }
-      ballots = [...ballots, b];
     }
-    closeModal();
-    showNotice("Your pick is sealed until the ceremony.");
   } catch (e) {
     console.error("[awards-night] save pick failed", e);
     const btn = form?.querySelector('[type="submit"]');
     if (btn) { btn.disabled = false; btn.textContent = btn.dataset.label ?? btn.textContent; }
-    formError(form, "Couldn’t save your pick — try again.");
+    return formError(form, "Couldn’t save your pick — try again.");
   }
+  // A pick is frozen once the ceremony is revealed; the hub then answers
+  // 200 with nothing changed, so re-read rather than show a saved pick.
+  if (refused) {
+    closeModal();
+    await refresh();
+    return showError("Your pick was not changed. Voting has closed for this ceremony.");
+  }
+  // The pick is stored: nothing below may report it as failed.
+  if (b) ballots = [...ballots, b];
+  else {
+    const idx = ballots.findIndex(x => x.id === existing.id);
+    if (idx !== -1) ballots[idx] = { ...ballots[idx], nominee_member_id: nomineeMemberId, nominee_name: nomineeName, reason, updated_at: now };
+  }
+  closeModal();
+  showNotice("Your pick is sealed until the ceremony.");
 }
 
 async function revealCeremony(id) {
@@ -499,30 +510,33 @@ async function revealCeremony(id) {
   });
   if (!ok) return;
   const now = nowIso();
+  let refused = false;
   try {
     if (DB) {
       const res = await dbq("UPDATE app_awards_night__ceremonies SET status = 'revealed', revealed_at = ? WHERE id = ?", [now, id]);
-      // An archived ceremony is frozen: nothing changed, so nothing to announce.
-      if (res.changed === 0) {
-        await refresh();
-        return showError("This ceremony can no longer be changed.");
-      }
-      await reloadBallots();
+      refused = res.changed === 0;
     }
-    const idx = ceremonies.findIndex(c => c.id === id);
-    if (idx !== -1) ceremonies[idx] = { ...ceremonies[idx], status: STATUS.REVEALED, revealed_at: now };
-    const cer = ceremonies[idx];
-    showNotice("🏆 The winners are revealed!");
-    publishEvent("awards_night.ceremony_revealed", id, { title: cer?.title });
-    sendHubNotification({
-      title: "🏆 Awards Night results are in!",
-      body: `${cer?.title ?? "The ceremony"} — see who won.`,
-      url: hubAppUrl(APP_ID, { ceremonyId: id }),
-    }).catch(() => {});
   } catch (e) {
     console.error("[awards-night] reveal failed", e);
-    showError("Couldn’t reveal the winners — try again.");
+    return showError("Couldn’t reveal the winners — try again.");
   }
+  // An archived ceremony is frozen: nothing changed, so nothing to announce.
+  if (refused) {
+    await refresh();
+    return showError("This ceremony can no longer be changed.");
+  }
+  // The reveal is stored: nothing below may report it as failed.
+  await reloadBallots().catch(e => console.error("[awards-night] reload picks failed", e));
+  const idx = ceremonies.findIndex(c => c.id === id);
+  if (idx !== -1) ceremonies[idx] = { ...ceremonies[idx], status: STATUS.REVEALED, revealed_at: now };
+  const cer = ceremonies[idx];
+  showNotice("🏆 The winners are revealed!");
+  publishEvent("awards_night.ceremony_revealed", id, { title: cer?.title });
+  sendHubNotification({
+    title: "🏆 Awards Night results are in!",
+    body: `${cer?.title ?? "The ceremony"} — see who won.`,
+    url: hubAppUrl(APP_ID, { ceremonyId: id }),
+  }).catch(() => {});
 }
 
 async function archiveCeremony(id) {
@@ -537,13 +551,14 @@ async function archiveCeremony(id) {
   const now = nowIso();
   try {
     if (DB) await dbq("UPDATE app_awards_night__ceremonies SET status = 'archived', archived_at = ? WHERE id = ?", [now, id]);
-    const idx = ceremonies.findIndex(c => c.id === id);
-    if (idx !== -1) ceremonies[idx] = { ...ceremonies[idx], status: STATUS.ARCHIVED, archived_at: now };
-    showNotice("Ceremony archived.");
   } catch (e) {
     console.error("[awards-night] archive failed", e);
-    showError("Couldn’t archive the ceremony — try again.");
+    return showError("Couldn’t archive the ceremony — try again.");
   }
+  // The archive is stored: nothing below may report it as failed.
+  const idx = ceremonies.findIndex(c => c.id === id);
+  if (idx !== -1) ceremonies[idx] = { ...ceremonies[idx], status: STATUS.ARCHIVED, archived_at: now };
+  showNotice("Ceremony archived.");
 }
 
 async function addCategory(form) {
@@ -569,14 +584,15 @@ async function addCategory(form) {
         [cat.id, cat.ceremony_id, cat.title, cat.nominee_type, cat.sort_order, cat.created_by_id, cat.created_at]
       );
     }
-    categories = [...categories, cat];
-    closeModal();
-    showNotice("Category added.");
   } catch (e) {
     if (btn) { btn.disabled = false; btn.textContent = "Add category"; }
     console.error("[awards-night] add category failed", e);
-    formError(form, "Couldn’t add the category — try again.");
+    return formError(form, "Couldn’t add the category — try again.");
   }
+  // The category is stored: nothing below may report it as failed.
+  categories = [...categories, cat];
+  closeModal();
+  showNotice("Category added.");
 }
 
 async function deleteCategory(categoryId) {
@@ -599,13 +615,14 @@ async function deleteCategory(categoryId) {
       // trusted endpoint. Removing the category is enough for the UI.
       await dbq("DELETE FROM app_awards_night__categories WHERE id = ?", [categoryId]);
     }
-    categories = categories.filter(c => c.id !== categoryId);
-    ballots = ballots.filter(b => b.category_id !== categoryId);
-    showNotice("Category removed.");
   } catch (e) {
     console.error("[awards-night] remove category failed", e);
-    showError("Couldn’t remove the category — try again.");
+    return showError("Couldn’t remove the category — try again.");
   }
+  // The removal is stored: nothing below may report it as failed.
+  categories = categories.filter(c => c.id !== categoryId);
+  ballots = ballots.filter(b => b.category_id !== categoryId);
+  showNotice("Category removed.");
 }
 
 function publishEvent(type, subjectId, payload) {
