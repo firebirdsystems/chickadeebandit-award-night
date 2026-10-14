@@ -191,7 +191,7 @@ import { esc, memberColor, initial, hubConfirm, sendHubNotification, hubAppUrl, 
 import {
   STATUS, isVoting, isRevealed, canManage as _canManage, canCastBallot as _canCastBallot,
   myBallotFor, myProgress, tallyCategory, searchableFields, failureLine,
-  isUnknownOutcome, pickRetryOutcome,
+  isUnknownOutcome, pickRetryOutcome, createRetryDiffers,
 } from "./logic.js";
 
 const CONTEXT    = window.__CONTEXT_URL ?? "";
@@ -222,6 +222,17 @@ function starterCats() {
   ];
 }
 let draftCats = starterCats();
+// The awards night's id, minted on the create form's first submit and sent on
+// every retry with the draft's category ids (pinned on each draft entry), so a
+// retry after a lost answer finds the night that landed rather than adding a
+// second. Forgotten with the draft when the create succeeds.
+let draftCerId = null;
+// Leaving the create form: a later create is a new night, so its ids are new too
+// (the typed draft itself is kept).
+function forgetDraftIds() {
+  draftCerId = null;
+  for (const d of draftCats) delete d.id;
+}
 
 // ── Small utils ───────────────────────────────────────────────────────────────
 function nowIso() { return new Date().toISOString(); }
@@ -397,6 +408,8 @@ async function createCeremony(form) {
   const title = form.title.value.trim();
   const subtitle = form.subtitle.value.trim();
   const revealDate = form.reveal_date.value;
+  // Each draft category keeps its id across retries (see draftCerId).
+  for (const d of draftCats) d.id ??= uid("cat");
   const cleanCats = draftCats
     .map((c, i) => ({ ...c, title: c.title.trim(), sort_order: i }))
     .filter(c => c.title);
@@ -408,16 +421,18 @@ async function createCeremony(form) {
   if (btn?.disabled) return;
   if (btn) { btn.disabled = true; btn.textContent = "Creating…"; }
 
-  const cer = {
-    id: uid("cer"), title, subtitle, status: STATUS.VOTING,
+  draftCerId ??= uid("cer");
+  let cer = {
+    id: draftCerId, title, subtitle, status: STATUS.VOTING,
     created_by_id: currentMember.id, created_by_name: currentMember.name,
     created_at: nowIso(), reveal_date: revealDate, revealed_at: "", archived_at: "",
   };
-  const cats = cleanCats.map(c => ({
-    id: uid("cat"), ceremony_id: cer.id, title: c.title, description: "",
+  let cats = cleanCats.map(c => ({
+    id: c.id, ceremony_id: cer.id, title: c.title, description: "",
     nominee_type: c.nominee_type === "text" ? "text" : "member",
     sort_order: c.sort_order, created_by_id: currentMember.id, created_at: nowIso(),
   }));
+  let note = "";
 
   try {
     if (DB) {
@@ -440,16 +455,35 @@ async function createCeremony(form) {
     }
   } catch (e) {
     console.error("[awards-night] create failed", e);
-    if (btn) { btn.disabled = false; btn.textContent = "Create awards night"; }
-    return formError(form, failureLine(e, { action: "create the awards night", thing: "awards night" }));
+    // Unknown outcome: read back by the pinned id. The batch is atomic, so a
+    // stored night has its categories with it. Found means an earlier try
+    // landed and the success path runs now, once, with what is stored. Not
+    // found, or the read failed: the create fails as before, ids still pinned.
+    let stored = null;
+    if (DB && isUnknownOutcome(e)) {
+      try {
+        const row = (await dbq("SELECT * FROM app_awards_night__ceremonies WHERE id = ?", [cer.id])).rows?.[0];
+        if (row) stored = { ceremony: row, categories: (await dbq("SELECT * FROM app_awards_night__categories WHERE ceremony_id = ?", [cer.id])).rows ?? [] };
+      } catch (readErr) { console.error("[awards-night] create re-read failed", readErr); }
+    }
+    if (!stored) {
+      if (btn) { btn.disabled = false; btn.textContent = "Create awards night"; }
+      return formError(form, failureLine(e, { action: "create the awards night", thing: "awards night" }));
+    }
+    // Edited since that first try: what was stored is kept, and said so.
+    if (createRetryDiffers(stored, { title, subtitle, revealDate, cats })) note = "Saved as first entered — check it and update what changed.";
+    cer = stored.ceremony;
+    cats = stored.categories;
   }
   // The create is stored: nothing below may report it as failed.
-  ceremonies = [cer, ...ceremonies];
-  categories = [...categories, ...cats];
+  ceremonies = [cer, ...ceremonies.filter(c => c.id !== cer.id)];
+  categories = [...categories.filter(c => c.ceremony_id !== cer.id), ...cats];
   selectedId = cer.id;
   view = "list";
   draftCats = starterCats(); // the next create form starts fresh
-  showNotice("Awards night created. Invite everyone to cast their picks.");
+  draftCerId = null;
+  if (note) showError(note);
+  else showNotice("Awards night created. Invite everyone to cast their picks.");
   publishEvent("awards_night.ceremony_created", cer.id, { title: cer.title });
 }
 
@@ -509,7 +543,12 @@ async function saveBallot(categoryId, { nomineeMemberId, nomineeName, reason }) 
       const stored = ceremonies.find(c => c.id === cer.id);
       // refresh() re-applies a launch link; stay on the ceremony the message is about.
       if (stored) { selectedId = cer.id; render(); }
-      if (!reread) { restore(); return formError(form, "Couldn’t save your pick — try again."); }
+      // A 403 on a changed pick keeps its own line. On a new pick it may be the
+      // cap refusing this pick's own stored row, so with no re-read it stays "try again".
+      if (!reread) {
+        restore();
+        return formError(form, existing ? failureLine(e, { action: "save your pick", thing: "pick" }) : "Couldn’t save your pick — try again.");
+      }
       if (!stored) {
         if (modalEl === dialog) closeModal();
         return showError("This awards night has been removed.");
@@ -1112,10 +1151,10 @@ document.addEventListener("click", (e) => {
   const t = e.target.closest("button, [data-open]");
   if (!t) return;
   const open = t.getAttribute("data-open");
-  if (open) { selectedId = open; view = "list"; clearMessages(); render(); return; }
+  if (open) { if (view === "create") forgetDraftIds(); selectedId = open; view = "list"; clearMessages(); render(); return; }
   if (t.matches("[data-back]")) { selectedId = null; clearMessages(); render(); return; }
   if (t.matches("[data-view-create]")) { view = "create"; clearMessages(); render(); return; }
-  if (t.matches("[data-view-list]")) { view = "list"; clearMessages(); render(); return; }
+  if (t.matches("[data-view-list]")) { if (view === "create") forgetDraftIds(); view = "list"; clearMessages(); render(); return; }
   if (t.matches("[data-refresh]") || t.matches('[data-testid="load-retry"]')) { refresh(); return; }
   if (t.matches("[data-close-modal]")) { closeModal(); return; }
   if (t.matches("[data-add-draft]")) { addDraft(); return; }

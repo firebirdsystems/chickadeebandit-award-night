@@ -129,6 +129,24 @@ export function pickRetryOutcome(stored, { pinnedId, nomineeMemberId, nomineeNam
 }
 
 /**
+ * After a create whose answer was lost, the re-read found the awards night
+ * stored under this form's pinned id. Whether what is stored differs from what
+ * the form holds now: the ceremony's own fields, or its categories (pinned ids,
+ * titles, nominee types and order). `stored` is { ceremony, categories };
+ * `form` is { title, subtitle, revealDate, cats: [{ id, title, nominee_type, sort_order }] }.
+ */
+export function createRetryDiffers(stored, form) {
+  const c = stored?.ceremony ?? {};
+  if ((c.title ?? "") !== (form.title ?? "") || (c.subtitle ?? "") !== (form.subtitle ?? "")
+    || (c.reveal_date ?? "") !== (form.revealDate ?? "")) return true;
+  const have = [...(stored?.categories ?? [])].sort((a, b) => Number(a.sort_order) - Number(b.sort_order));
+  const want = form.cats ?? [];
+  if (have.length !== want.length) return true;
+  return want.some((w, i) => have[i].id !== w.id || (have[i].title ?? "") !== (w.title ?? "")
+    || (have[i].nominee_type ?? "") !== (w.nominee_type ?? "") || Number(have[i].sort_order) !== Number(w.sort_order));
+}
+
+/**
  * The line a failed write shows ("Refused, gone, or failed" in the app-template
  * guide): "try again" only when retrying can work. `action` and `thing` are the
  * app's own words. `found` is the caller's re-read after a write that changed

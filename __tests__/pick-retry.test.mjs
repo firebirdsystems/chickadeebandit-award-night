@@ -1,5 +1,5 @@
 import { describe, it, expect } from "vitest";
-import { isUnknownOutcome, pickRetryOutcome } from "../src/logic.js";
+import { isUnknownOutcome, pickRetryOutcome, createRetryDiffers } from "../src/logic.js";
 
 const err = (props) => Object.assign(new Error("hub text"), props);
 
@@ -37,5 +37,30 @@ describe("pickRetryOutcome", () => {
     const text = { pinnedId: "bal-1", nomineeMemberId: "", nomineeName: "The road trip", reason: "" };
     expect(pickRetryOutcome({ id: "x", nominee_member_id: "", nominee_name: "The road trip", reason: "" }, text)).toBe("saved");
     expect(pickRetryOutcome({ id: "x", nominee_member_id: "", nominee_name: "Snow day", reason: "" }, text)).toBe("other");
+  });
+});
+
+describe("createRetryDiffers", () => {
+  const cats = [
+    { id: "cat-1", title: "Best chef", nominee_type: "member", sort_order: 0 },
+    { id: "cat-2", title: "Moment of the year", nominee_type: "text", sort_order: 1 },
+  ];
+  const form = { title: "Family Awards", subtitle: "", revealDate: "", cats };
+  const stored = (over = {}, storedCats = cats) => ({
+    ceremony: { id: "cer-1", title: "Family Awards", subtitle: "", reveal_date: "", ...over },
+    // Stored rows come back in any order and carry extra columns.
+    categories: [...storedCats].reverse().map((c) => ({ ...c, ceremony_id: "cer-1", description: "" })),
+  });
+
+  it("is false when the night landed as the form holds it", () => {
+    expect(createRetryDiffers(stored(), form)).toBe(false);
+  });
+  it("is true when a ceremony field was edited since", () => {
+    expect(createRetryDiffers(stored({ title: "First title" }), form)).toBe(true);
+  });
+  it("is true when a category was renamed, added or removed since", () => {
+    expect(createRetryDiffers(stored({}, [cats[0], { ...cats[1], title: "Old" }]), form)).toBe(true);
+    expect(createRetryDiffers(stored({}, [cats[0]]), form)).toBe(true);
+    expect(createRetryDiffers(stored(), { ...form, cats: [cats[0]] })).toBe(true);
   });
 });
