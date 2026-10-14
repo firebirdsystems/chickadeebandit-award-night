@@ -549,11 +549,22 @@ async function archiveCeremony(id) {
   });
   if (!ok) return;
   const now = nowIso();
+  let refused = false;
   try {
-    if (DB) await dbq("UPDATE app_awards_night__ceremonies SET status = 'archived', archived_at = ? WHERE id = ?", [now, id]);
+    if (DB) {
+      const res = await dbq("UPDATE app_awards_night__ceremonies SET status = 'archived', archived_at = ? WHERE id = ?", [now, id]);
+      refused = res.changed === 0;
+    }
   } catch (e) {
     console.error("[awards-night] archive failed", e);
     return showError("Couldn’t archive the ceremony — try again.");
+  }
+  // Already archived elsewhere, or gone: nothing changed, so show what is stored.
+  if (refused) {
+    await refresh();
+    // refresh() re-applies a launch link; stay on the ceremony the message is about.
+    if (ceremonies.some(c => c.id === id)) selectedId = id;
+    return showError("This ceremony can no longer be changed.");
   }
   // The archive is stored: nothing below may report it as failed.
   const idx = ceremonies.findIndex(c => c.id === id);
