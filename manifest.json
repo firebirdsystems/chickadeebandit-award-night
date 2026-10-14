@@ -29,15 +29,6 @@
       "frozen_when": {
         "status_column": "status",
         "locked_values": ["archived"]
-      },
-      "retain_days": {
-        "default": 730,
-        "timestamp_column": "created_at",
-        "override_key": "ceremony_history",
-        "dependent_tables": [
-          { "table": "categories", "foreign_key": "ceremony_id" },
-          { "table": "ballots", "foreign_key": "ceremony_id" }
-        ]
       }
     },
     "categories": {
@@ -66,6 +57,17 @@
         "status_column": "status",
         "locked_values": ["revealed", "archived"]
       }
+    }
+  },
+  "retention": {
+    "ceremonies": {
+      "default": 730,
+      "timestamp_column": "created_at",
+      "override_key": "ceremony_history",
+      "dependent_tables": [
+        { "table": "categories", "foreign_key": "ceremony_id" },
+        { "table": "ballots", "foreign_key": "ceremony_id" }
+      ]
     }
   },
   "member_references": {
@@ -112,9 +114,6 @@
   "widget": {
     "label": "Awards Night",
     "size": "small"
-  },
-  "resource_limits": {
-    "max_db_bytes": 52428800
   },
   "icon": "🏆",
   "ai_access": {
