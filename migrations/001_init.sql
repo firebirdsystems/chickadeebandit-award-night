@@ -1,5 +1,5 @@
 CREATE TABLE IF NOT EXISTS app_awards_night__ceremonies (
-  id TEXT PRIMARY KEY,
+  id TEXT NOT NULL PRIMARY KEY,
   title TEXT NOT NULL,
   subtitle TEXT DEFAULT '',
   status TEXT NOT NULL DEFAULT 'voting' CHECK (status IN ('voting', 'revealed', 'archived')),
@@ -12,7 +12,7 @@ CREATE TABLE IF NOT EXISTS app_awards_night__ceremonies (
 );
 
 CREATE TABLE IF NOT EXISTS app_awards_night__categories (
-  id TEXT PRIMARY KEY,
+  id TEXT NOT NULL PRIMARY KEY,
   ceremony_id TEXT NOT NULL,
   title TEXT NOT NULL,
   description TEXT DEFAULT '',
@@ -24,7 +24,7 @@ CREATE TABLE IF NOT EXISTS app_awards_night__categories (
 );
 
 CREATE TABLE IF NOT EXISTS app_awards_night__ballots (
-  id TEXT PRIMARY KEY,
+  id TEXT NOT NULL PRIMARY KEY,
   ceremony_id TEXT NOT NULL,
   category_id TEXT NOT NULL,
   member_id TEXT NOT NULL,
